@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARC Group | Livestock Risk Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;
+  --border2:#3a4149;--gold:#c9a84c;--green:#2ecc71;--red:#e74c3c;
+  --blue:#58a6ff;--text:#e6edf3;--text-muted:#7d8590;--text-dim:#8b949e;
+  --blue-hdr:#1c5585;--orange:#e8a838;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;min-height:100vh;}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.login-box{background:var(--surface);border:1px solid var(--border2);padding:48px;width:400px;position:relative;}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:4px;color:var(--gold);margin-bottom:4px;}
+.login-sub{font-size:11px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:36px;}
+.login-label{font-size:11px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:7px;}
+.login-input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:11px 14px;font-family:'IBM Plex Mono',monospace;font-size:14px;outline:none;transition:border-color .2s;margin-bottom:18px;}
+.login-input:focus{border-color:var(--gold);}
+.login-btn{width:100%;background:var(--gold);border:none;color:#000;padding:13px;font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;}
+.login-btn:hover{opacity:.85;}
+.login-error{color:var(--red);font-size:12px;margin-top:10px;display:none;}
+#app{display:none;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.header-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:var(--gold);}
+.header-right{display:flex;align-items:center;gap:14px;}
+.upload-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--gold);padding:5px 14px;font-size:11px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;}
+.upload-btn:hover{background:var(--border2);}
+.logout-btn{background:none;border:none;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;}
+#file-input{display:none;}
+.data-status{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);display:flex;align-items:center;gap:6px;}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--text-muted);}
+.status-dot.live{background:var(--green);}
+.tabs{display:flex;padding:0 20px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;}
+.tab{padding:11px 18px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.main{padding:20px;max-width:1300px;margin:0 auto;}
+.panel{display:none;}
+.panel.active{display:block;}
+.sum-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:22px;}
+.s-card{background:var(--surface);border:1px solid var(--border);padding:12px 14px;}
+.s-card-label{font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
+.s-card-val{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;}
+.s-card-val.pos{color:var(--green);}
+.s-card-val.neg{color:var(--red);}
+.s-card-val.gold{color:var(--gold);}
+.s-card-sub{font-size:10px;color:var(--text-muted);margin-top:2px;}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:var(--gold);margin:20px 0 8px;border-bottom:1px solid var(--border);padding-bottom:5px;}
+.xl-wrap{overflow-x:auto;margin-bottom:6px;}
+.xl{border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:12px;}
+.xl th,.xl td{border:1px solid var(--border2);padding:5px 10px;white-space:nowrap;}
+.xl th{background:var(--surface2);color:var(--text-muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:600;text-align:center;}
+.xl td{color:var(--text);text-align:right;}
+.xl td.lbl{text-align:left;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-weight:600;background:var(--surface);}
+.xl td.sub{text-align:left;color:var(--text-muted);font-family:'IBM Plex Sans',sans-serif;padding-left:22px;background:var(--surface);}
+.xl td.hdr{background:var(--blue-hdr);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;text-align:center;font-weight:400;padding:8px;}
+.xl td.goal{background:rgba(46,204,113,0.2);color:var(--green);font-weight:700;}
+.xl td.yel{background:rgba(201,168,76,0.18);color:var(--gold);font-weight:700;}
+.xl td.neg{color:var(--red);}
+.xl td.dark{background:#080c12;color:#3a4560;}
+.xl td.edit{background:rgba(200,200,200,0.07);border:1px solid rgba(200,200,200,0.18) !important;}
+.xl-input{background:transparent;border:none;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:12px;width:80px;text-align:right;outline:none;padding:0;}
+.xl-input:focus{background:rgba(201,168,76,0.1);border-radius:2px;}
+.note{font-size:11px;color:var(--text-muted);margin:4px 0 2px;font-style:italic;}
+.note-green{background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.2);color:#6de0a0;padding:3px 10px;font-size:11px;display:inline-block;margin-top:4px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;}
+.span-2{grid-column:span 2;}
+.span-3{grid-column:span 3;}
+@media(max-width:800px){.grid-4{grid-template-columns:1fr 1fr;}.span-2{grid-column:span 2;}.span-3{grid-column:span 2;}}
+.card{background:var(--surface);border:1px solid var(--border);padding:16px;margin-bottom:14px;}
+.card-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.card-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.stat-val{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;}
+.stat-val.pos{color:var(--green);}
+.stat-val.neg{color:var(--red);}
+.tbl-wrap{overflow-x:auto;}
+table.gen{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:12px;}
+table.gen th{text-align:left;padding:7px 10px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border2);background:var(--surface2);white-space:nowrap;}
+table.gen td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text-dim);white-space:nowrap;}
+table.gen tr:hover td{background:rgba(255,255,255,0.02);}
+.tr{text-align:right;}.tc{text-align:center;}
+.tp{color:var(--green);}.tn{color:var(--red);}.tg{color:var(--gold);}
+.badge{display:inline-block;padding:2px 7px;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.b-buy{background:rgba(46,204,113,.12);color:var(--green);}
+.b-sell{background:rgba(231,76,60,.12);color:var(--red);}
+.b-put{background:rgba(88,166,255,.12);color:var(--blue);}
+.b-call{background:rgba(201,168,76,.12);color:var(--gold);}
+.b-fut{background:rgba(255,255,255,.06);color:var(--text-dim);}
+.b-live{background:rgba(201,168,76,.1);color:var(--gold);}
+.b-feed{background:rgba(88,166,255,.1);color:var(--blue);}
+.b-wi{background:rgba(232,168,56,.15);color:var(--orange);}
+.chart-container{position:relative;height:300px;}
+.chart-controls{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.cht-tog{background:var(--surface2);border:1px solid var(--border2);color:var(--text-muted);padding:4px 12px;font-size:11px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;}
+.cht-tog.active{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600;}
+.empty{text-align:center;padding:60px 20px;color:var(--text-muted);}
+.empty-icon{font-size:40px;margin-bottom:14px;opacity:.3;}
+.empty-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--text-muted);margin-bottom:6px;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);}
+/* What-If Hedges specific styles */
+.wih-section{background:var(--surface);border:1px solid var(--border);padding:16px;margin-bottom:14px;}
+.wih-section-title{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:var(--gold);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.wih-input-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+.wih-input-group{display:flex;flex-direction:column;gap:4px;}
+.wih-input-label{font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;}
+.wih-input{background:var(--bg);border:1px solid var(--border2);color:var(--gold);padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:13px;width:120px;outline:none;}
+.wih-input:focus{border-color:var(--gold);}
+.wih-select{background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;cursor:pointer;}
+.wih-select:focus{border-color:var(--gold);}
+.wih-btn{background:var(--gold);border:none;color:#000;padding:8px 18px;font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;align-self:flex-end;}
+.wih-btn:hover{opacity:.85;}
+.wih-btn-danger{background:none;border:1px solid var(--red);color:var(--red);padding:7px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;cursor:pointer;align-self:flex-end;}
+.wih-positions-table{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:12px;margin-top:8px;}
+.wih-positions-table th{text-align:left;padding:7px 10px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border2);background:var(--surface2);white-space:nowrap;}
+.wih-positions-table td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text-dim);white-space:nowrap;}
+.wih-positions-table td.tr{text-align:right;}
+.wih-positions-table tr.wi-row{background:rgba(232,168,56,0.05);}
+.wih-positions-table tr.wi-row td{color:var(--orange);}
+.wih-positions-table tr:hover td{background:rgba(255,255,255,0.02);}
+.wih-remove-btn{background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:0 4px;opacity:0.6;}
+.wih-remove-btn:hover{opacity:1;}
+.summary-box{background:var(--surface2);border:1px solid var(--border2);padding:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:14px;}
+.summary-item{display:flex;flex-direction:column;gap:3px;}
+.summary-item-label{font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;}
+.summary-item-val{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600;}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border2);padding:32px;width:520px;max-width:95vw;position:relative;}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--gold);margin-bottom:6px;}
+.modal-sub{font-size:12px;color:var(--text-muted);margin-bottom:24px;line-height:1.6;}
+.modal-label{font-size:10px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:7px;}
+.modal-input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:10px 12px;font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;margin-bottom:16px;}
+.modal-input:focus{border-color:var(--gold);}
+.modal-btns{display:flex;gap:10px;margin-top:4px;}
+.modal-btn-primary{background:var(--gold);border:none;color:#000;padding:10px 20px;font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;}
+.modal-btn-secondary{background:var(--surface2);border:1px solid var(--border2);color:var(--text-muted);padding:10px 20px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;cursor:pointer;}
+.modal-btn-danger{background:none;border:1px solid var(--red);color:var(--red);padding:10px 20px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;cursor:pointer;margin-left:auto;}
+.modal-steps{background:var(--surface2);border:1px solid var(--border);padding:16px;margin-bottom:20px;}
+.modal-steps-title{font-size:10px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;}
+.modal-step{display:flex;gap:10px;margin-bottom:8px;font-size:12px;color:var(--text-dim);line-height:1.5;}
+.modal-step-num{background:var(--gold);color:#000;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;}
+</style>
+</head>
+<body>
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">ARC GROUP</div>
+    <div class="login-sub">Livestock Risk Management</div>
+    <label class="login-label" for="lu">Username</label>
+    <input class="login-input" type="text" id="lu" placeholder="username" autocomplete="username">
+    <label class="login-label" for="lp">Password</label>
+    <input class="login-input" type="password" id="lp" placeholder="••••••••" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">SIGN IN</button>
+    <div class="login-error" id="lerr">Invalid credentials. Please try again.</div>
+  </div>
+</div>
+<div id="app">
+  <div class="header">
+    <div class="header-logo">THE ARC GROUP</div>
+    <div class="header-right">
+      <div class="data-status" id="data-status"><div class="status-dot" id="status-dot"></div><span id="status-text">Loading…</span></div>
+      <button class="upload-btn" onclick="openSettings()">⚙ OneDrive</button>
+      <button class="upload-btn" style="color:var(--text-dim)" onclick="document.getElementById('file-input').click()">⬆ Manual Upload</button>
+      <input type="file" id="file-input" accept=".xlsx,.xls" onchange="loadExcel(event)">
+      <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('summary')">Summary</div>
+    <div class="tab" onclick="showTab('hedges')">Hedges</div>
+    <div class="tab" onclick="showTab('lrp')">LRP</div>
+    <div class="tab" onclick="showTab('whatifhedges')">What-If Hedges</div>
+    <div class="tab" onclick="showTab('whatif')">What If Analysis</div>
+  </div>
+  <div class="main">
+    <div id="panel-summary" class="panel active"></div>
+    <div id="panel-hedges" class="panel"></div>
+    <div id="panel-lrp" class="panel"></div>
+    <div id="panel-whatifhedges" class="panel"></div>
+    <div id="panel-whatif" class="panel"></div>
+  </div>
+</div>
+
+<!-- ONEDRIVE SETTINGS MODAL -->
+<div class="modal-overlay" id="settings-modal" onclick="if(event.target===this)closeSettings()">
+  <div class="modal">
+    <div class="modal-title">OneDrive Connection</div>
+    <div class="modal-sub">Connect your Excel file on OneDrive so the dashboard fetches the latest data automatically every time you log in — no uploading needed.</div>
+    <div class="modal-steps">
+      <div class="modal-steps-title">One-time setup</div>
+      <div class="modal-step"><div class="modal-step-num">1</div><div>Open OneDrive in your browser and find your Excel file</div></div>
+      <div class="modal-step"><div class="modal-step-num">2</div><div>Right-click the file → <strong style="color:var(--text)">Share</strong> → set permission to <strong style="color:var(--text)">"Anyone with the link can view"</strong></div></div>
+      <div class="modal-step"><div class="modal-step-num">3</div><div>Click <strong style="color:var(--text)">Copy link</strong> and paste it below</div></div>
+    </div>
+    <label class="modal-label" for="od-url-input">OneDrive Sharing Link</label>
+    <input class="modal-input" id="od-url-input" type="url" placeholder="https://1drv.ms/x/s!...  or  https://onedrive.live.com/...">
+    <div class="modal-btns">
+      <button class="modal-btn-primary" onclick="applyOneDriveUrl()">Save &amp; Connect</button>
+      <button class="modal-btn-secondary" onclick="closeSettings()">Cancel</button>
+      <button class="modal-btn-danger" onclick="clearOneDriveUrl()">Clear Link</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── AUTH ──────────────────────────────────────────────────
+const USERS={'blake':'koppitz2025','arc':'arcgroup2025','admin':'arcadmin2025'};
+
+function doLogin(){
+  const u=document.getElementById('lu').value.trim().toLowerCase();
+  const p=document.getElementById('lp').value;
+  if(USERS[u]&&USERS[u]===p){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    document.getElementById('lerr').style.display='none';
+    const url=getOneDriveUrl();
+    if(url){ fetchFromOneDrive(url); }
+    else { loadSavedData(); }
+  } else {
+    document.getElementById('lerr').style.display='block';
+  }
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.getElementById('login-screen').style.display!=='none')doLogin();
+});
+function doLogout(){
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app').style.display='none';
+  document.getElementById('lu').value='';
+  document.getElementById('lp').value='';
+}
+
+// ── STATE ──────────────────────────────────────────────────
+let currentClient=null, wifChart=null;
+// What-If Hedges state: extra user-added positions
+let wihExtraPositions=[];
+const STORAGE_KEY='arc_dashboard_data_v3';
+const WIH_EXTRA_KEY='arc_wih_extra_v1';
+const ONEDRIVE_URL_KEY='arc_onedrive_url';
+
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const tabs=['summary','hedges','lrp','whatifhedges','whatif'];
+  document.querySelectorAll('.tab')[tabs.indexOf(name)].classList.add('active');
+  document.getElementById('panel-'+name).classList.add('active');
+}
+
+// ── ONEDRIVE AUTO-FETCH ────────────────────────────────────
+function oneDriveLinkToDownload(shareUrl){
+  try{
+    const url=new URL(shareUrl.trim());
+    if(url.searchParams.get('download')==='1') return shareUrl.trim();
+    url.searchParams.set('download','1');
+    return url.toString();
+  } catch(e){ return null; }
+}
+function getOneDriveUrl(){ return localStorage.getItem(ONEDRIVE_URL_KEY)||null; }
+function saveOneDriveUrl(url){
+  if(url) localStorage.setItem(ONEDRIVE_URL_KEY,url.trim());
+  else localStorage.removeItem(ONEDRIVE_URL_KEY);
+}
+async function fetchFromOneDrive(shareUrl){
+  const downloadUrl=oneDriveLinkToDownload(shareUrl);
+  if(!downloadUrl){ loadSavedData(); return; }
+  updateStatus('Fetching from OneDrive…',false,true);
+  try{
+    const resp=await fetch(downloadUrl);
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    const buf=await resp.arrayBuffer();
+    const wb=XLSX.read(new Uint8Array(buf),{type:'array',cellDates:true});
+    parseWorkbook(wb);
+    updateStatus('OneDrive · '+new Date().toLocaleTimeString(),false,false);
+  } catch(e){
+    console.warn('OneDrive fetch failed:',e);
+    const raw=localStorage.getItem(STORAGE_KEY)||sessionStorage.getItem(STORAGE_KEY);
+    if(raw){
+      currentClient=JSON.parse(raw);
+      renderAll(currentClient);
+      updateStatus(currentClient.uploadDate+' (cached — OneDrive unreachable)',true,false);
+    } else {
+      setInitialEmpty();
+      updateStatus('OneDrive link failed — upload manually',false,false);
+    }
+  }
+}
+
+// ── BROWSER STORAGE ────────────────────────────────────────
+function saveToStorage(client){
+  try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(client)); }
+  catch(e){ try{ sessionStorage.setItem(STORAGE_KEY,JSON.stringify(client)); } catch(e2){} }
+}
+function loadSavedData(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY)||sessionStorage.getItem(STORAGE_KEY);
+    if(raw){
+      currentClient=JSON.parse(raw);
+      // Load extra what-if hedges
+      try{ const ex=localStorage.getItem(WIH_EXTRA_KEY); if(ex) wihExtraPositions=JSON.parse(ex); } catch(e){}
+      renderAll(currentClient);
+      updateStatus(currentClient.uploadDate,true,false);
+    } else { setInitialEmpty(); }
+  } catch(e){ setInitialEmpty(); }
+}
+function updateStatus(text,fromCache,loading){
+  const dot=document.getElementById('status-dot');
+  const txt=document.getElementById('status-text');
+  if(loading){ if(dot)dot.className='status-dot'; if(txt)txt.textContent=text; return; }
+  if(dot) dot.className='status-dot live';
+  if(txt) txt.textContent=(fromCache?'📁 Cached: ':'✓ ')+text;
+}
+function applyOneDriveUrl(){
+  const input=document.getElementById('od-url-input');
+  if(!input)return;
+  const val=input.value.trim();
+  if(!val){ alert('Please paste your OneDrive sharing link.'); return; }
+  saveOneDriveUrl(val); closeSettings(); fetchFromOneDrive(val);
+}
+function clearOneDriveUrl(){
+  saveOneDriveUrl(null);
+  const input=document.getElementById('od-url-input');
+  if(input) input.value='';
+  alert('OneDrive link cleared. You can upload manually using the Upload button.');
+}
+function openSettings(){
+  const m=document.getElementById('settings-modal'); if(!m)return;
+  const saved=getOneDriveUrl();
+  const inp=document.getElementById('od-url-input');
+  if(inp) inp.value=saved||'';
+  m.style.display='flex';
+}
+function closeSettings(){ const m=document.getElementById('settings-modal'); if(m) m.style.display='none'; }
+
+// ── EXCEL LOAD ────────────────────────────────────────────
+function loadExcel(event){
+  const file=event.target.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
+    parseWorkbook(wb);
+  };
+  reader.readAsArrayBuffer(file);
+  event.target.value='';
+}
+
+// ── CELL HELPERS ──────────────────────────────────────────
+function gc(ws,row,col){
+  if(!ws)return null;
+  const cell=ws[XLSX.utils.encode_cell({r:row-1,c:col-1})];
+  if(!cell||cell.t==='e')return null;
+  return cell.v;
+}
+function gt(ws,row,col){
+  if(!ws)return'';
+  const cell=ws[XLSX.utils.encode_cell({r:row-1,c:col-1})];
+  if(!cell||cell.t==='e')return'';
+  if(cell.t==='d'){
+    try{const d=new Date(cell.v);return(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getDate().toString().padStart(2,'0')+'/'+d.getFullYear();}
+    catch{return String(cell.v);}
+  }
+  return cell.v!=null?String(cell.v):'';
+}
+
+// ── WORKBOOK PARSER ───────────────────────────────────────
+function parseWorkbook(wb){
+  const sumWs  = wb.Sheets['Summary'];
+  const hedWs  = wb.Sheets['Hedges'];
+  const lrpWs  = wb.Sheets['LRP'];
+  const wihWs  = wb.Sheets['What-If Hedges'];
+  const lcWifWs= wb.Sheets['Live Cattle What If'];
+  const fcWifWs= wb.Sheets['Feeder Cattle What If'];
+  const cbWifWs= wb.Sheets['Combined What If'];
+
+  currentClient={
+    summary:     parseSummary(sumWs),
+    hedges:      parseHedges(hedWs),
+    lrp:         parseLRP(lrpWs),
+    wihPositions:parseWIHPositions(wihWs),
+    lcPositions: parsePositions(lcWifWs,'LE'),
+    fcPositions: parsePositions(fcWifWs,'GF'),
+    whatif:      parseWhatIf(fcWifWs,lcWifWs,cbWifWs),
+    uploadDate:  new Date().toLocaleDateString()
+  };
+
+  // Load any extra user-added what-if hedges from local storage
+  try{ const ex=localStorage.getItem(WIH_EXTRA_KEY); if(ex) wihExtraPositions=JSON.parse(ex); } catch(e){}
+
+  saveToStorage(currentClient);
+  updateStatus(currentClient.uploadDate,false);
+  renderAll(currentClient);
+}
+
+// ── PARSERS ───────────────────────────────────────────────
+// Summary sheet: labels in col B (col 2), data starts in col C (col 3)
+function parseSummary(ws){
+  if(!ws)return{};
+  return{
+    acct: gc(ws,2,2),
+    lc:{
+      contracts:gc(ws,4,3), head:gc(ws,4,4), avgPrice:gc(ws,4,5), delta:gc(ws,4,6),
+      fut:{contracts:gc(ws,5,3), avgPrice:gc(ws,5,5)},
+      put:{contracts:gc(ws,6,3)},
+      lrp:{contracts:gc(ws,7,3), head:gc(ws,7,4), delta:gc(ws,7,6)}
+    },
+    fc:{
+      contracts:gc(ws,8,3), head:gc(ws,8,4), avgPrice:gc(ws,8,5), delta:gc(ws,8,6),
+      fut:{contracts:gc(ws,9,3), head:gc(ws,9,4), avgPrice:gc(ws,9,5)},
+      put:{contracts:gc(ws,10,3), head:gc(ws,10,4), avgPrice:gc(ws,10,5)},
+      lrp:{contracts:gc(ws,11,3), head:gc(ws,11,4), avgPrice:gc(ws,11,5), delta:gc(ws,11,6)}
+    },
+    prot:{
+      head:{live:gc(ws,16,4), feeder:gc(ws,16,5), total:gc(ws,16,6), goal:gc(ws,16,7)},
+      delta:{live:gc(ws,17,4), feeder:gc(ws,17,5), total:gc(ws,17,6)}
+    },
+    // Row 19=LIVE CATTLE header, row 20=column headers, row 21=Current Inventory
+    lc_cur:{head:gc(ws,21,4), cash:gc(ws,21,5), cashVal:gc(ws,21,7), openHedge:gc(ws,21,8), netPrice:gc(ws,21,9)},
+    lc_wi: {head:gc(ws,22,4), cash:gc(ws,22,5), fut:gc(ws,22,6), cashVal:gc(ws,22,7), openHedge:gc(ws,22,8), netPrice:gc(ws,22,9)},
+    lc_wt: {weight:gc(ws,23,5), hedgeDiff:gc(ws,23,8), var:gc(ws,23,9)},
+    // Row 25=FEEDER CATTLE header, row 26=column headers, row 27=Current Inventory
+    fc_cur:{head:gc(ws,27,4), cash:gc(ws,27,5), cashVal:gc(ws,27,7), openHedge:gc(ws,27,8), netPrice:gc(ws,27,9)},
+    fc_wi: {head:gc(ws,28,4), cash:gc(ws,28,5), fut:gc(ws,28,6), cashVal:gc(ws,28,7), openHedge:gc(ws,28,8), netPrice:gc(ws,28,9)},
+    fc_wt: {weight:gc(ws,29,5), hedgeDiff:gc(ws,29,8), var:gc(ws,29,9)}
+  };
+}
+
+function parseHedges(ws){
+  if(!ws)return{openPL:0,rows:[]};
+  // Row 1: account number in col 1, "ADMIS HEDGES" in col 3, "Open P/L" in col 7, value in col 8
+  // Row 2: column headers
+  // Data starts row 3
+  const openPL=gc(ws,1,8);
+  const rows=[];
+  const rng=XLSX.utils.decode_range(ws['!ref']||'A1:W1');
+  for(let r=3;r<=rng.e.r+1;r++){
+    const desc=gc(ws,r,3), date=gc(ws,r,1);
+    if(!desc&&!date)continue;
+    if(typeof date==='string'&&date==='Date')continue; // skip extra header rows
+    rows.push({
+      date: gt(ws,r,1),
+      bs: gc(ws,r,2),
+      desc,
+      contracts: gc(ws,r,4),
+      size: gc(ws,r,5),
+      enterPrice: gc(ws,r,6),
+      currPrice: gc(ws,r,7),
+      openPL: gc(ws,r,8),
+      contract: gc(ws,r,10),
+      type: gc(ws,r,11),
+      strike: gc(ws,r,12),
+      cattleType: gc(ws,r,13)
+    });
+  }
+  return{openPL,rows};
+}
+
+function parseLRP(ws){
+  if(!ws)return{totalCost:0,rows:[]};
+  // Row 1: "Livestock Risk Protection" in col 6
+  // Row 2: account, total contracts (col 9), total cost (col 13)
+  // Row 3: headers
+  // Data starts row 4
+  const totalContracts=gc(ws,2,9);
+  const totalCost=gc(ws,2,13);
+  const rows=[];
+  const rng=XLSX.utils.decode_range(ws['!ref']||'A1:P1');
+  for(let r=4;r<=rng.e.r+1;r++){
+    const dateVal=gc(ws,r,1);
+    const head=gc(ws,r,7);
+    if(!dateVal||!head)continue;
+    rows.push({
+      date: gt(ws,r,1),
+      bs: gc(ws,r,2),
+      desc: gc(ws,r,3),
+      contract: gc(ws,r,4),
+      type: gc(ws,r,5),
+      strike: gc(ws,r,6),
+      head,
+      typeCode: gc(ws,r,8),
+      contracts: gc(ws,r,9),
+      weight: gc(ws,r,10),
+      totalCostStr: gc(ws,r,11),
+      priceCwt: gc(ws,r,12),
+      totalCost: gc(ws,r,13),
+      cattleType: gc(ws,r,14)
+    });
+  }
+  return{totalContracts,totalCost,rows};
+}
+
+// Parse What-If Hedges sheet positions (cols A-K, rows 2+)
+function parseWIHPositions(ws){
+  if(!ws)return[];
+  const positions=[];
+  const rng=XLSX.utils.decode_range(ws['!ref']||'A1:V1');
+  for(let r=2;r<=Math.min(rng.e.r+1,100);r++){
+    const bs=gc(ws,r,1);
+    const desc=gc(ws,r,2);
+    const typeStr=gc(ws,r,3);
+    const contracts=gc(ws,r,4);
+    const size=gc(ws,r,5);
+    const strike=gc(ws,r,6);
+    const enterPrice=gc(ws,r,7);
+    if(!bs&&!desc)continue;
+    // Contract / type from right side
+    const contract=gc(ws,r,9);
+    const optType=gc(ws,r,10);
+    const optStrike=gc(ws,r,11);
+    const cattleType=gc(ws,r,12);
+    positions.push({
+      bs: bs||'Sell',
+      desc: desc||'',
+      typeStr: typeStr||optType||'Futures',
+      contracts: contracts||0,
+      size: size||500,
+      strike: optStrike||strike||0,
+      enterPrice: enterPrice||0,
+      contract: contract||'',
+      cattleType: cattleType||'Feeder',
+      isFromSheet: true
+    });
+  }
+  return positions;
+}
+
+function parsePositions(ws,filterType){
+  if(!ws)return[];
+  const positions=[];
+  const rng=XLSX.utils.decode_range(ws['!ref']||'A1:A1');
+  for(let r=4;r<=Math.min(rng.e.r+1,3901);r++){
+    const O=gc(ws,r,15);
+    if(!O||O!==filterType)continue;
+    const J=gc(ws,r,10);
+    if(J&&J>0)continue;
+    const Q=gc(ws,r,17);
+    const G=gc(ws,r,7),H=gc(ws,r,8),I=gc(ws,r,9);
+    const F=gc(ws,r,6);
+    const S=gc(ws,r,19)||0,T=gc(ws,r,20)||0,U=gc(ws,r,21)||0,V=gc(ws,r,22)||0;
+    if(!Q||!G||!H)continue;
+    positions.push({type:Q.trim(),strike:F,contracts:G,size:H,entryPrice:I,premium:(S+T+U+V)});
+  }
+  return positions;
+}
+
+function parseWhatIf(fcWs,lcWs,cbWs){
+  const r={pcts:[],feederPrices:[],livePrices:[],feederVAR:[],liveVAR:[],combinedVAR:[]};
+  if(!fcWs&&!lcWs)return r;
+  for(let c=50;c<=91;c++){
+    const pct=fcWs?gc(fcWs,1,c):gc(lcWs,1,c);
+    if(pct==null)continue;
+    r.pcts.push(pct);
+    if(fcWs){r.feederPrices.push(gc(fcWs,2,c));r.feederVAR.push(gc(fcWs,3,c));}
+    if(lcWs){r.livePrices.push(gc(lcWs,2,c));r.liveVAR.push(gc(lcWs,3,c));}
+  }
+  if(cbWs){for(let c=2;c<=42;c++)r.combinedVAR.push(gc(cbWs,2,c));}
+  return r;
+}
+
+// ── VAR CALCULATION ────────────────────────────────────────
+function positionPL(pos,price){
+  const{type,strike,contracts,size,entryPrice,premium}=pos;
+  let pl=0;
+  const t=(type||'').toLowerCase().replace(/\s+/g,' ').trim();
+  if(t==='sell futures')     pl=entryPrice-price;
+  else if(t==='buy futures') pl=price-entryPrice;
+  else if(t==='buy put')     pl=price<strike?strike-price:0;
+  else if(t==='sell put')    pl=price>strike?0:price-strike;
+  else if(t==='buy call')    pl=price>strike?price-strike:0;
+  else if(t==='sell call')   pl=price>strike?strike-price:0;
+  return(premium+pl)*contracts*size;
+}
+
+// ── FORMAT ─────────────────────────────────────────────────
+function f$(v,d=2){
+  if(v==null||v===''||isNaN(v))return'—';
+  const n=Number(v),abs=Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+  return n<0?'($'+abs+')':'$'+abs;
+}
+function fN(v,d=2){if(v==null||v===''||isNaN(v))return'—';return Number(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function fP(v){return(v==null||isNaN(v))?'—':(Number(v)*100).toFixed(1)+'%';}
+function nc(v){return(v!=null&&!isNaN(v)&&Number(v)<0)?'neg':'';}
+function tc(v){return(v!=null&&!isNaN(v))?Number(v)<0?'tn':Number(v)>0?'tp':'':'';}
+
+function renderAll(c){renderSummary(c);renderHedges(c);renderLRP(c);renderWhatIfHedges(c);renderWhatIf(c);}
+
+// ── SUMMARY ────────────────────────────────────────────────
+function renderSummary(c){
+  const s=c.summary;
+  const lc=s.lc||{},fc=s.fc||{};
+  const ph=(s.prot||{}).head||{},pd=(s.prot||{}).delta||{};
+  const lcr=s.lc_cur||{},lwi=s.lc_wi||{},lwt=s.lc_wt||{};
+  const fcr=s.fc_cur||{},fwi=s.fc_wi||{},fwt=s.fc_wt||{};
+  const hpl=c.hedges?c.hedges.openPL:null;
+  const lrpTotalCost=c.lrp?c.lrp.totalCost:null;
+
+  document.getElementById('panel-summary').innerHTML=`
+  <div class="sec-title">Contracts</div>
+  <div class="xl-wrap"><table class="xl">
+    <thead><tr><th style="text-align:left;width:120px"></th><th>Contracts</th><th>Head</th><th>Avg. Price</th><th>Delta</th></tr></thead>
+    <tbody>
+      <tr><td class="lbl">Live Cattle</td><td>${fN(lc.contracts,0)}</td><td>${fN(lc.head,0)}</td><td>$ ${fN(lc.avgPrice,3)}</td><td>${lc.delta!=null?fN(lc.delta,2)+' head':'—'}</td></tr>
+      <tr><td class="sub">Futures</td><td>${fN(lc.fut?.contracts,0)}</td><td></td><td>$ ${fN(lc.fut?.avgPrice,3)}</td><td></td></tr>
+      <tr><td class="sub">Puts</td><td>${fN(lc.put?.contracts,0)}</td><td></td><td></td><td></td></tr>
+      <tr><td class="sub">LRP</td><td>${fN(lc.lrp?.contracts,2)}</td><td>${fN(lc.lrp?.head,0)}</td><td></td><td>${lc.lrp?.delta!=null?fN(lc.lrp.delta,2):'—'}</td></tr>
+      <tr><td class="lbl">Feeders</td><td>${fN(fc.contracts,2)}</td><td>${fN(fc.head,0)}</td><td>$ ${fN(fc.avgPrice,3)}</td><td>${fc.delta!=null?fN(fc.delta,2)+' head':'—'}</td></tr>
+      <tr><td class="sub">Futures</td><td>${fN(fc.fut?.contracts,0)}</td><td>${fN(fc.fut?.head,0)}</td><td>$ ${fN(fc.fut?.avgPrice,3)}</td><td></td></tr>
+      <tr><td class="sub">Puts</td><td>${fN(fc.put?.contracts,0)}</td><td>${fN(fc.put?.head,0)}</td><td>$ ${fN(fc.put?.avgPrice,3)}</td><td></td></tr>
+      <tr><td class="sub">LRP</td><td>${fN(fc.lrp?.contracts,2)}</td><td>${fN(fc.lrp?.head,0)}</td><td>$ ${fN(fc.lrp?.avgPrice,3)}</td><td>${fc.lrp?.delta!=null?fN(fc.lrp.delta,2):'—'}</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="sec-title">Percent Protected</div>
+  <div class="xl-wrap"><table class="xl" style="width:auto">
+    <thead><tr><th style="width:80px"></th><th>Live</th><th>Feeder</th><th>Total</th><th>Goal</th></tr></thead>
+    <tbody>
+      <tr><td class="lbl">Head</td><td>${fP(ph.live)}</td><td>${fP(ph.feeder)}</td><td>${fP(ph.total)}</td><td class="goal">${fP(ph.goal)}</td></tr>
+      <tr><td class="lbl">Delta</td><td>${fP(pd.live)}</td><td>${fP(pd.feeder)}</td><td>${fP(pd.total)}</td><td></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="xl-wrap" style="margin-top:20px"><table class="xl" style="width:auto">
+    <thead>
+      <tr><td colspan="7" class="hdr">LIVE CATTLE</td></tr>
+      <tr><th style="width:160px;text-align:left"></th><th>Head</th><th>Cash</th><th>Futures</th><th>Cash Value</th><th>Open Hedges</th><th>Net Price</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="lbl">Current Inventory</td>
+        <td class="edit"><input class="xl-input" id="lc_head_cur" type="number" value="${lcr.head??''}" oninput="recalcAll()"></td>
+        <td class="edit">$&nbsp;<input class="xl-input" id="lc_cash_cur" type="number" step="0.001" value="${lcr.cash??''}" oninput="recalcAll()"></td>
+        <td class="dark">$$</td>
+        <td id="lc_cv_cur">$ ${fN(lcr.cashVal,0)}</td>
+        <td id="lc_oh_cur" class="${nc(lcr.openHedge)}">${f$(lcr.openHedge,0)}</td>
+        <td id="lc_np_cur">$ ${fN(lcr.netPrice,3)}</td>
+      </tr>
+      <tr>
+        <td class="lbl">What If</td>
+        <td class="edit"><input class="xl-input" id="lc_head_wi" type="number" value="${lwi.head??''}" oninput="recalcAll()"></td>
+        <td class="edit">$&nbsp;<input class="xl-input" id="lc_cash_wi" type="number" step="0.001" value="${lwi.cash??''}" oninput="recalcAll()"></td>
+        <td class="edit">$&nbsp;<input class="xl-input" id="lc_fut_wi" type="number" step="0.001" value="${lwi.fut??''}" oninput="recalcAll()"></td>
+        <td id="lc_cv_wi">$ ${fN(lwi.cashVal,0)}</td>
+        <td id="lc_oh_wi" class="${nc(lwi.openHedge)}">${f$(lwi.openHedge,0)}</td>
+        <td id="lc_np_wi">$ ${fN(lwi.netPrice,3)}</td>
+      </tr>
+      <tr>
+        <td class="sub">Weight (lbs)</td>
+        <td class="edit"><input class="xl-input" id="lc_weight" type="number" value="${lwt.weight??''}" oninput="recalcAll()"></td>
+        <td></td><td></td><td>$ —</td>
+        <td id="lc_hedge_diff" class="${nc(lwt.hedgeDiff)}">${f$(lwt.hedgeDiff,0)}</td>
+        <td id="lc_var" class="yel">${f$(lwt.var,0)}</td>
+      </tr>
+    </tbody>
+  </table></div>
+  <div class="note">* You can change the values in the gray cells.</div>
+  <div class="note-green">$$ — Current Futures Price is marked-to-market at recent prices</div>
+
+  <div class="xl-wrap" style="margin-top:22px"><table class="xl" style="width:auto">
+    <thead>
+      <tr><td colspan="7" class="hdr">FEEDER CATTLE</td></tr>
+      <tr><th style="width:160px;text-align:left"></th><th>Head</th><th>Cash</th><th>Futures</th><th>Cash Value</th><th>Open Hedges</th><th>Net Price</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="lbl">Current Inventory</td>
+        <td class="edit"><input class="xl-input" id="fc_head_cur" type="number" value="${fcr.head??''}" oninput="recalcAll()"></td>
+        <td class="edit">$&nbsp;<input class="xl-input" id="fc_cash_cur" type="number" step="0.001" value="${fcr.cash??''}" oninput="recalcAll()"></td>
+        <td class="dark">$$</td>
+        <td id="fc_cv_cur">$ ${fN(fcr.cashVal,0)}</td>
+        <td id="fc_oh_cur" class="${nc(fcr.openHedge)}">${f$(fcr.openHedge,0)}</td>
+        <td id="fc_np_cur">$ ${fN(fcr.netPrice,3)}</td>
+      </tr>
+      <tr>
+        <td class="lbl">What If</td>
+        <td class="edit"><input class="xl-input" id="fc_head_wi" type="number" value="${fwi.head??''}" oninput="recalcAll()"></td>
+        <td class="edit">$&nbsp;<input class="xl-input" id="fc_cash_wi" type="number" step="0.001" value="${fwi.cash??''}" oninput="recalcAll()"></td>
+        <td class="edit">$&nbsp;<input class="xl-input" id="fc_fut_wi" type="number" step="0.001" value="${fwi.fut??''}" oninput="recalcAll()"></td>
+        <td id="fc_cv_wi">$ ${fN(fwi.cashVal,0)}</td>
+        <td id="fc_oh_wi" class="${nc(fwi.openHedge)}">${f$(fwi.openHedge,0)}</td>
+        <td id="fc_np_wi">$ ${fN(fwi.netPrice,3)}</td>
+      </tr>
+      <tr>
+        <td class="sub">Weight (lbs)</td>
+        <td class="edit"><input class="xl-input" id="fc_weight" type="number" value="${fwt.weight??''}" oninput="recalcAll()"></td>
+        <td></td><td></td><td>$ —</td>
+        <td id="fc_hedge_diff" class="${nc(fwt.hedgeDiff)}">${f$(fwt.hedgeDiff,0)}</td>
+        <td id="fc_var" class="yel">${f$(fwt.var,0)}</td>
+      </tr>
+    </tbody>
+  </table></div>
+  <div class="note">* You can change the values in the gray cells.</div>
+  <div class="note-green">$$ — Current Futures Price is marked-to-market at recent prices</div>
+  `;
+  recalcAll();
+}
+
+// ── RECALCULATE ────────────────────────────────────────────
+// Converts a wihExtraPosition into the same format positionPL() expects
+function wihPosToPL(p, price){
+  // type string: "buy futures", "sell put", etc.
+  const typeStr=(p.bs==='Buy'?'buy ':'sell ')+(p.type||'futures').toLowerCase();
+  const pos={type:typeStr, strike:p.strike||0, contracts:p.contracts||0, size:p.size||0, entryPrice:p.enterPrice||0, premium:0};
+  return positionPL(pos, price);
+}
+
+function recalcAll(){
+  if(!currentClient)return;
+  // LIVE
+  const lcHC=parseFloat(document.getElementById('lc_head_cur')?.value)||0;
+  const lcCC=parseFloat(document.getElementById('lc_cash_cur')?.value)||0;
+  const lcHW=parseFloat(document.getElementById('lc_head_wi')?.value)||0;
+  const lcCW=parseFloat(document.getElementById('lc_cash_wi')?.value)||0;
+  const lcFW=parseFloat(document.getElementById('lc_fut_wi')?.value)||0;
+  const lcWt=parseFloat(document.getElementById('lc_weight')?.value)||0;
+  const lcCwt=lcWt/100;
+  const lcOHCur=currentClient.summary.lc_cur?.openHedge||0;
+  const lcCVCur=lcHC*lcCC*lcCwt;
+  const lcCVWI=lcHW*lcCW*lcCwt;
+  // Base positions from What-If sheets
+  const lcOHWI_base=currentClient.lcPositions.reduce((s,p)=>s+positionPL(p,lcFW),0);
+  // Add custom WIH positions for Live Cattle
+  const lcOHWI_custom=wihExtraPositions.filter(p=>p.cattleType==='Live').reduce((s,p)=>s+wihPosToPL(p,lcFW),0);
+  const lcOHWI=lcOHWI_base+lcOHWI_custom;
+  const lcNPCur=lcHC>0&&lcCwt>0?(lcCVCur+lcOHCur)/(lcHC*lcCwt):0;
+  const lcNPWI=lcHW>0&&lcCwt>0?(lcCVWI+lcOHWI)/(lcHW*lcCwt):0;
+  const lcHD=lcOHWI-lcOHCur;
+  const lcVAR=(lcCVWI-lcCVCur)+lcHD;
+  setEl('lc_cv_cur','$ '+fN(lcCVCur,0));
+  setEl('lc_oh_cur',f$(lcOHCur,0),nc(lcOHCur));
+  setEl('lc_np_cur','$ '+fN(lcNPCur,3));
+  setEl('lc_cv_wi','$ '+fN(lcCVWI,0));
+  setEl('lc_oh_wi',f$(lcOHWI,0),nc(lcOHWI));
+  setEl('lc_np_wi','$ '+fN(lcNPWI,3));
+  setEl('lc_hedge_diff',f$(lcHD,0),nc(lcHD));
+  setEl('lc_var',f$(lcVAR,0),'yel');
+  // FEEDER
+  const fcHC=parseFloat(document.getElementById('fc_head_cur')?.value)||0;
+  const fcCC=parseFloat(document.getElementById('fc_cash_cur')?.value)||0;
+  const fcHW=parseFloat(document.getElementById('fc_head_wi')?.value)||0;
+  const fcCW=parseFloat(document.getElementById('fc_cash_wi')?.value)||0;
+  const fcFW=parseFloat(document.getElementById('fc_fut_wi')?.value)||0;
+  const fcWt=parseFloat(document.getElementById('fc_weight')?.value)||0;
+  const fcCwt=fcWt/100;
+  const fcOHCur=currentClient.summary.fc_cur?.openHedge||0;
+  const fcCVCur=fcHC*fcCC*fcCwt;
+  const fcCVWI=fcHW*fcCW*fcCwt;
+  // Base positions from What-If sheets
+  const fcOHWI_base=currentClient.fcPositions.reduce((s,p)=>s+positionPL(p,fcFW),0);
+  // Add custom WIH positions for Feeder Cattle
+  const fcOHWI_custom=wihExtraPositions.filter(p=>p.cattleType==='Feeder').reduce((s,p)=>s+wihPosToPL(p,fcFW),0);
+  const fcOHWI=fcOHWI_base+fcOHWI_custom;
+  const fcNPCur=fcHC>0&&fcCwt>0?(fcCVCur+fcOHCur)/(fcHC*fcCwt):0;
+  const fcNPWI=fcHW>0&&fcCwt>0?(fcCVWI+fcOHWI)/(fcHW*fcCwt):0;
+  const fcHD=fcOHWI-fcOHCur;
+  const fcVAR=(fcCVWI-fcCVCur)+fcHD;
+  setEl('fc_cv_cur','$ '+fN(fcCVCur,0));
+  setEl('fc_oh_cur',f$(fcOHCur,0),nc(fcOHCur));
+  setEl('fc_np_cur','$ '+fN(fcNPCur,3));
+  setEl('fc_cv_wi','$ '+fN(fcCVWI,0));
+  setEl('fc_oh_wi',f$(fcOHWI,0),nc(fcOHWI));
+  setEl('fc_np_wi','$ '+fN(fcNPWI,3));
+  setEl('fc_hedge_diff',f$(fcHD,0),nc(fcHD));
+  setEl('fc_var',f$(fcVAR,0),'yel');
+}
+function setEl(id,txt,cls){const el=document.getElementById(id);if(!el)return;el.textContent=txt;if(cls!==undefined)el.className=cls;}
+
+// ── HEDGES ─────────────────────────────────────────────────
+function renderHedges(c){
+  const h=c.hedges;
+  if(!h||!h.rows.length){document.getElementById('panel-hedges').innerHTML=emptyState('No Hedge Data','Upload an Excel file to view ADMIS hedge positions.');return;}
+  const rows=h.rows.filter(r=>r.desc||r.contract);
+  // Split by cattle type
+  const liveRows=rows.filter(r=>r.cattleType==='Live'||(!r.cattleType&&r.contract&&r.contract.startsWith('LE')));
+  const feederRows=rows.filter(r=>r.cattleType==='Feeder'||(!r.cattleType&&r.contract&&r.contract.startsWith('GF')));
+  const otherRows=rows.filter(r=>!liveRows.includes(r)&&!feederRows.includes(r));
+
+  function makeRows(arr){
+    return arr.map(r=>{
+      const bsCls=r.bs==='Buy'?'b-buy':'b-sell';
+      const tCls=r.type==='Put'?'b-put':r.type==='Call'?'b-call':'b-fut';
+      const catCls=r.cattleType==='Live'?'b-live':r.cattleType==='Feeder'?'b-feed':'b-fut';
+      return`<tr>
+        <td>${r.date||''}</td>
+        <td><span class="badge ${bsCls}">${r.bs||''}</span></td>
+        <td style="text-align:left;font-family:'IBM Plex Sans',sans-serif">${r.desc||''}</td>
+        <td class="tr">${r.contracts!=null?fN(r.contracts,0):'—'}</td>
+        <td class="tr">${r.size!=null?fN(r.size,0):'—'}</td>
+        <td class="tr">${fN(r.enterPrice,3)}</td>
+        <td class="tr">${fN(r.currPrice,3)}</td>
+        <td class="tr ${tc(r.openPL)}">${f$(r.openPL)}</td>
+        <td>${r.contract||''}</td>
+        <td><span class="badge ${tCls}">${r.type||''}</span></td>
+        <td class="tr">${r.strike||''}</td>
+        <td>${r.cattleType?`<span class="badge ${catCls}">${r.cattleType}</span>`:''}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  const livePL=liveRows.reduce((s,r)=>s+(r.openPL||0),0);
+  const feederPL=feederRows.reduce((s,r)=>s+(r.openPL||0),0);
+
+  document.getElementById('panel-hedges').innerHTML=`
+    <div class="grid-4">
+      <div class="card span-2"><div class="card-title">ADMIS — Total Open P/L</div><div class="stat-val ${h.openPL<0?'neg':'pos'}">${f$(h.openPL)}</div></div>
+      <div class="card"><div class="card-title">Live Cattle P/L</div><div class="stat-val ${livePL<0?'neg':'pos'}">${f$(livePL)}</div></div>
+      <div class="card"><div class="card-title">Feeder Cattle P/L</div><div class="stat-val ${feederPL<0?'neg':'pos'}">${f$(feederPL)}</div></div>
+    </div>
+    ${liveRows.length?`
+    <div class="card">
+      <div class="card-title">Live Cattle Positions (${liveRows.length})</div>
+      <div class="tbl-wrap"><table class="gen">
+        <thead><tr><th>Date</th><th>B/S</th><th>Description</th><th class="tr">Contracts</th><th class="tr">Size</th><th class="tr">Enter $</th><th class="tr">Current $</th><th class="tr">Open P/L</th><th>Contract</th><th>Type</th><th class="tr">Strike</th><th>Category</th></tr></thead>
+        <tbody>${makeRows(liveRows)}</tbody>
+      </table></div>
+    </div>`:''}
+    ${feederRows.length?`
+    <div class="card">
+      <div class="card-title">Feeder Cattle Positions (${feederRows.length})</div>
+      <div class="tbl-wrap"><table class="gen">
+        <thead><tr><th>Date</th><th>B/S</th><th>Description</th><th class="tr">Contracts</th><th class="tr">Size</th><th class="tr">Enter $</th><th class="tr">Current $</th><th class="tr">Open P/L</th><th>Contract</th><th>Type</th><th class="tr">Strike</th><th>Category</th></tr></thead>
+        <tbody>${makeRows(feederRows)}</tbody>
+      </table></div>
+    </div>`:''}
+    ${otherRows.length?`
+    <div class="card">
+      <div class="card-title">Other Positions (${otherRows.length})</div>
+      <div class="tbl-wrap"><table class="gen">
+        <thead><tr><th>Date</th><th>B/S</th><th>Description</th><th class="tr">Contracts</th><th class="tr">Size</th><th class="tr">Enter $</th><th class="tr">Current $</th><th class="tr">Open P/L</th><th>Contract</th><th>Type</th><th class="tr">Strike</th><th>Category</th></tr></thead>
+        <tbody>${makeRows(otherRows)}</tbody>
+      </table></div>
+    </div>`:''}`;
+}
+
+// ── LRP ────────────────────────────────────────────────────
+function renderLRP(c){
+  const l=c.lrp;
+  if(!l||!l.rows||!l.rows.length){document.getElementById('panel-lrp').innerHTML=emptyState('No LRP Data','Upload an Excel file to view LRP policies.');return;}
+  const tbody=l.rows.map(r=>{
+    const catCls=r.cattleType==='Live'?'b-live':r.cattleType==='Feeder'?'b-feed':'';
+    return`<tr>
+      <td>${r.date||''}</td>
+      <td>${r.contract||''}</td>
+      <td>${r.type||''}</td>
+      <td class="tr">${fN(r.strike,2)}</td>
+      <td class="tr">${fN(r.head,0)}</td>
+      <td>${r.typeCode||''}</td>
+      <td class="tr">${fN(r.contracts,2)}</td>
+      <td class="tr">${fN(r.weight,0)}</td>
+      <td class="tr">${r.totalCostStr||''}</td>
+      <td class="tr">${fN(r.priceCwt,3)}</td>
+      <td class="tr ${tc(-1)}">${f$(r.totalCost,0)}</td>
+      <td>${r.cattleType?`<span class="badge ${catCls}">${r.cattleType}</span>`:''}</td>
+    </tr>`;
+  }).join('');
+
+  const totalHead=l.rows.reduce((s,r)=>s+(r.head||0),0);
+  const totalContracts=l.totalContracts||l.rows.reduce((s,r)=>s+(r.contracts||0),0);
+  const totalCost=l.totalCost||l.rows.reduce((s,r)=>s+(r.totalCost||0),0);
+
+  document.getElementById('panel-lrp').innerHTML=`
+    <div class="grid-4" style="margin-bottom:14px">
+      <div class="card span-2"><div class="card-title">LRP — Total Premium Cost</div><div class="stat-val neg">${f$(totalCost,0)}</div></div>
+      <div class="card"><div class="card-title">Total Contracts</div><div class="stat-val">${fN(totalContracts,2)}</div></div>
+      <div class="card"><div class="card-title">Total Head Covered</div><div class="stat-val">${fN(totalHead,0)}</div></div>
+    </div>
+    <div class="card"><div class="card-title">Livestock Risk Protection Policies</div>
+      <div class="tbl-wrap"><table class="gen">
+        <thead><tr><th>Exp. Date</th><th>Contract</th><th>Type</th><th class="tr">Strike</th><th class="tr">Head</th><th>Code</th><th class="tr">Contracts</th><th class="tr">Weight</th><th class="tr">Total Cost</th><th class="tr">$/CWT</th><th class="tr">Total Cost $</th><th>Category</th></tr></thead>
+        <tbody>${tbody}</tbody>
+      </table></div>
+    </div>`;
+}
+
+// ── WHAT-IF HEDGES ─────────────────────────────────────────
+function renderWhatIfHedges(c){
+  const panel=document.getElementById('panel-whatifhedges');
+  if(!c){panel.innerHTML=emptyState('No Data','Upload an Excel file to use What-If Hedges.');return;}
+
+  const sheetPositions=c.wihPositions||[];
+
+  panel.innerHTML=`
+    <div class="grid-4">
+      <div class="card span-2">
+        <div class="card-title">What-If Hedges</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.7">
+          Model hypothetical hedge positions to evaluate potential P&L impact at different price levels.
+          Positions from the Excel sheet are loaded automatically. Add custom scenarios below.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Sheet Positions</div>
+        <div class="stat-val gold">${sheetPositions.length}</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Custom Positions</div>
+        <div class="stat-val" id="wih-extra-count">${wihExtraPositions.length}</div>
+      </div>
+    </div>
+
+    <!-- ADD POSITION FORM -->
+    <div class="wih-section">
+      <div class="wih-section-title">Add What-If Position</div>
+      <div class="wih-input-row">
+        <div class="wih-input-group">
+          <span class="wih-input-label">B / S</span>
+          <select class="wih-select" id="wih-bs">
+            <option value="Sell">Sell</option>
+            <option value="Buy">Buy</option>
+          </select>
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Instrument</span>
+          <select class="wih-select" id="wih-type">
+            <option value="Futures">Futures</option>
+            <option value="Put">Put</option>
+            <option value="Call">Call</option>
+          </select>
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Cattle Type</span>
+          <select class="wih-select" id="wih-cattle" onchange="document.getElementById('wih-size').value=this.value==='Live'?400:500">
+            <option value="Feeder">Feeder Cattle</option>
+            <option value="Live">Live Cattle</option>
+          </select>
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Contract</span>
+          <input class="wih-input" id="wih-contract" type="text" placeholder="e.g. GFX5" style="width:90px">
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Contracts</span>
+          <input class="wih-input" id="wih-contracts" type="number" value="1" min="1" style="width:80px">
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Size (lbs)</span>
+          <input class="wih-input" id="wih-size" type="number" value="500" min="1" style="width:80px">
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Enter Price</span>
+          <input class="wih-input" id="wih-enter" type="number" step="0.001" placeholder="0.000" style="width:90px">
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Strike (opts)</span>
+          <input class="wih-input" id="wih-strike" type="number" step="0.001" placeholder="0.000" style="width:90px">
+        </div>
+        <button class="wih-btn" onclick="wihAddPosition()">+ Add Position</button>
+      </div>
+      <div id="wih-add-error" style="color:var(--red);font-size:11px;display:none;margin-top:4px;"></div>
+    </div>
+
+    <!-- SHEET POSITIONS TABLE -->
+    ${sheetPositions.length?`
+    <div class="wih-section">
+      <div class="wih-section-title">Positions from Excel Sheet (${sheetPositions.length})</div>
+      <div class="tbl-wrap">
+        <table class="wih-positions-table">
+          <thead><tr>
+            <th>B/S</th><th>Description</th><th>Type</th><th>Contract</th><th class="tr">Contracts</th>
+            <th class="tr">Size</th><th class="tr">Enter Price</th><th class="tr">Strike</th>
+            <th>Category</th><th class="tr">P/L @ Scenario</th>
+          </tr></thead>
+          <tbody id="wih-sheet-tbody">
+            ${sheetPositions.map((p,i)=>{
+              const bsCls=p.bs==='Buy'?'b-buy':'b-sell';
+              const catCls=p.cattleType==='Live'?'b-live':'b-feed';
+              return`<tr>
+                <td><span class="badge ${bsCls}">${p.bs||''}</span></td>
+                <td style="font-family:'IBM Plex Sans',sans-serif">${p.desc||p.typeStr||''}</td>
+                <td>${p.typeStr||''}</td>
+                <td>${p.contract||''}</td>
+                <td class="tr">${fN(p.contracts,0)}</td>
+                <td class="tr">${fN(p.size,0)}</td>
+                <td class="tr">${fN(p.enterPrice,3)}</td>
+                <td class="tr">${p.strike?fN(p.strike,3):'—'}</td>
+                <td><span class="badge ${catCls}">${p.cattleType||''}</span></td>
+                <td class="tr" id="wih-sheet-pl-${i}">—</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`:''}
+
+    <!-- CUSTOM / EXTRA POSITIONS TABLE -->
+    <div class="wih-section">
+      <div class="wih-section-title" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Custom What-If Positions</span>
+        <button class="wih-btn-danger" onclick="wihClearAll()" style="font-size:10px;padding:4px 10px">Clear All Custom</button>
+      </div>
+      <div class="tbl-wrap" id="wih-extra-wrap">
+        ${renderWIHExtraTable()}
+      </div>
+    </div>
+  `;
+}
+
+function renderWIHExtraTable(){
+  if(!wihExtraPositions.length){
+    return`<div style="padding:20px;color:var(--text-muted);font-size:12px;text-align:center;">No custom positions added yet. Use the form above to add what-if scenarios.</div>`;
+  }
+  const rows=wihExtraPositions.map((p,i)=>{
+    const bsCls=p.bs==='Buy'?'b-buy':'b-sell';
+    const typeCls=p.type==='Put'?'b-put':p.type==='Call'?'b-call':'b-fut';
+    const catCls=p.cattleType==='Live'?'b-live':'b-feed';
+    return`<tr class="wi-row">
+      <td><span class="badge ${bsCls}">${p.bs}</span></td>
+      <td><span class="badge ${typeCls}">${p.type}</span></td>
+      <td>${p.contract||''}</td>
+      <td class="tr">${fN(p.contracts,0)}</td>
+      <td class="tr">${fN(p.size,0)}</td>
+      <td class="tr">${fN(p.enterPrice,3)}</td>
+      <td class="tr">${p.strike?fN(p.strike,3):'—'}</td>
+      <td><span class="badge ${catCls}">${p.cattleType}</span></td>
+      <td class="tr" id="wih-extra-pl-${i}">—</td>
+      <td><button class="wih-remove-btn" onclick="wihRemove(${i})">✕</button></td>
+    </tr>`;
+  }).join('');
+  return`<table class="wih-positions-table">
+    <thead><tr>
+      <th>B/S</th><th>Type</th><th>Contract</th><th class="tr">Contracts</th>
+      <th class="tr">Size</th><th class="tr">Enter Price</th><th class="tr">Strike</th>
+      <th>Category</th><th class="tr">P/L @ Scenario</th><th></th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function wihAddPosition(){
+  const errEl=document.getElementById('wih-add-error');
+  const bs=document.getElementById('wih-bs').value;
+  const type=document.getElementById('wih-type').value;
+  const cattleType=document.getElementById('wih-cattle').value;
+  const contract=document.getElementById('wih-contract').value.trim().toUpperCase();
+  const contracts=parseFloat(document.getElementById('wih-contracts').value)||0;
+  const size=parseFloat(document.getElementById('wih-size').value)||0;
+  const enterPrice=parseFloat(document.getElementById('wih-enter').value)||0;
+  const strike=parseFloat(document.getElementById('wih-strike').value)||0;
+
+  if(!contracts||!size||!enterPrice){
+    errEl.textContent='Please enter Contracts, Size, and Enter Price.';
+    errEl.style.display='block';
+    return;
+  }
+  if((type==='Put'||type==='Call')&&!strike){
+    errEl.textContent='Please enter a Strike price for Put/Call options.';
+    errEl.style.display='block';
+    return;
+  }
+  errEl.style.display='none';
+
+  wihExtraPositions.push({bs,type,cattleType,contract,contracts,size,enterPrice,strike});
+  try{ localStorage.setItem(WIH_EXTRA_KEY, JSON.stringify(wihExtraPositions)); } catch(e){}
+
+  // Refresh just the extra table and count
+  const wrap=document.getElementById('wih-extra-wrap');
+  if(wrap) wrap.innerHTML=renderWIHExtraTable();
+  const cnt=document.getElementById('wih-extra-count');
+  if(cnt) cnt.textContent=wihExtraPositions.length;
+  // Update Summary and What If Analysis with the new custom position
+  recalcAll();
+  if(currentClient) renderWhatIf(currentClient);
+  // Reset form
+  document.getElementById('wih-contracts').value='1';
+  document.getElementById('wih-size').value='500';
+  document.getElementById('wih-enter').value='';
+  document.getElementById('wih-strike').value='';
+  document.getElementById('wih-contract').value='';
+}
+
+function wihRemove(idx){
+  wihExtraPositions.splice(idx,1);
+  try{ localStorage.setItem(WIH_EXTRA_KEY, JSON.stringify(wihExtraPositions)); } catch(e){}
+  const wrap=document.getElementById('wih-extra-wrap');
+  if(wrap) wrap.innerHTML=renderWIHExtraTable();
+  const cnt=document.getElementById('wih-extra-count');
+  if(cnt) cnt.textContent=wihExtraPositions.length;
+  recalcAll();
+  if(currentClient) renderWhatIf(currentClient);
+}
+
+function wihClearAll(){
+  if(!confirm('Clear all custom what-if positions?'))return;
+  wihExtraPositions=[];
+  try{ localStorage.removeItem(WIH_EXTRA_KEY); } catch(e){}
+  const wrap=document.getElementById('wih-extra-wrap');
+  if(wrap) wrap.innerHTML=renderWIHExtraTable();
+  const cnt=document.getElementById('wih-extra-count');
+  if(cnt) cnt.textContent=0;
+  recalcAll();
+  if(currentClient) renderWhatIf(currentClient);
+}
+
+// ── WHAT IF ANALYSIS ────────────────────────────────────────
+// Augments the Excel-parsed VAR arrays with any custom WIH positions.
+// Returns {feederVAR, liveVAR, combinedVAR} each an array parallel to w.pcts.
+function computeAugmentedVAR(w){
+  const fcCustom=wihExtraPositions.filter(p=>p.cattleType==='Feeder');
+  const lcCustom=wihExtraPositions.filter(p=>p.cattleType==='Live');
+  const hasCustom=fcCustom.length||lcCustom.length;
+
+  return w.pcts.map((pct,i)=>{
+    const fcPrice=w.feederPrices[i];
+    const lcPrice=w.livePrices[i];
+    let fcAdj=0, lcAdj=0;
+    if(hasCustom){
+      fcCustom.forEach(p=>{ if(fcPrice!=null) fcAdj+=wihPosToPL(p,fcPrice); });
+      lcCustom.forEach(p=>{ if(lcPrice!=null) lcAdj+=wihPosToPL(p,lcPrice); });
+    }
+    const fv=(w.feederVAR[i]||0)+fcAdj;
+    const lv=(w.liveVAR[i]||0)+lcAdj;
+    const cv=(w.combinedVAR[i]||0)+fcAdj+lcAdj;
+    return{feederVAR:fv, liveVAR:lv, combinedVAR:cv};
+  });
+}
+
+function renderWhatIf(c){
+  const w=c.whatif;
+  if(!w||!w.pcts.length){document.getElementById('panel-whatif').innerHTML=emptyState('No What If Data','Upload an Excel file to view scenario analysis.');return;}
+  const curIdx=w.pcts.findIndex(p=>Math.abs(p)<0.001);
+  const augmented=computeAugmentedVAR(w);
+  const customCount=wihExtraPositions.length;
+
+  const tableRows=w.pcts.map((p,i)=>{
+    const cur=Math.abs(p)<0.001;
+    const av=augmented[i];
+    return`<tr style="${cur?'background:rgba(201,168,76,0.07)':''}">
+      <td class="${cur?'tg tr':'tr'}">${cur?'→ ':''}${(p*100).toFixed(1)}%</td>
+      <td class="tr">${f$(w.feederPrices[i],2)}</td>
+      <td class="tr">${f$(w.livePrices[i],2)}</td>
+      <td class="tr ${tc(av.feederVAR)}">${f$(av.feederVAR,0)}</td>
+      <td class="tr ${tc(av.liveVAR)}">${f$(av.liveVAR,0)}</td>
+      <td class="tr ${tc(av.combinedVAR)}">${f$(av.combinedVAR,0)}</td>
+    </tr>`;
+  }).join('');
+
+  const curAug=augmented[curIdx]||{feederVAR:0,liveVAR:0,combinedVAR:0};
+
+  document.getElementById('panel-whatif').innerHTML=`
+    <div class="grid-4">
+      <div class="card"><div class="card-title">Scenarios</div><div class="stat-val">${w.pcts.length}</div>${customCount?`<div class="s-card-sub" style="color:var(--orange);margin-top:4px">+${customCount} custom position${customCount>1?'s':''} included</div>`:''}</div>
+      <div class="card"><div class="card-title">Feeder VAR (Current)</div><div class="stat-val ${curAug.feederVAR<0?'neg':'pos'}">${f$(curAug.feederVAR,0)}</div></div>
+      <div class="card"><div class="card-title">Live VAR (Current)</div><div class="stat-val ${curAug.liveVAR<0?'neg':'pos'}">${f$(curAug.liveVAR,0)}</div></div>
+      <div class="card"><div class="card-title">Combined VAR (Current)</div><div class="stat-val ${curAug.combinedVAR<0?'neg':'pos'}">${f$(curAug.combinedVAR,0)}</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Value at Risk — Price Sensitivity${customCount?` <span style="color:var(--orange);font-size:10px;font-weight:600">(+${customCount} CUSTOM)</span>`:''}</div>
+      <div class="chart-controls">
+        <button class="cht-tog active" id="tog-combined" onclick="setWM('combined')">Combined</button>
+        <button class="cht-tog" id="tog-feeder" onclick="setWM('feeder')">Feeder Cattle</button>
+        <button class="cht-tog" id="tog-live" onclick="setWM('live')">Live Cattle</button>
+        <button class="cht-tog" id="tog-all" onclick="setWM('all')">All Three</button>
+      </div>
+      <div class="chart-container"><canvas id="wif-chart"></canvas></div>
+    </div>
+    <div class="card"><div class="card-title">Scenario Table${customCount?` — includes ${customCount} custom What-If position${customCount>1?'s':''}`:''}</div>
+      <div class="tbl-wrap"><table class="gen">
+        <thead><tr><th>Change</th><th class="tr">Feeder Price</th><th class="tr">Live Price</th><th class="tr">Feeder VAR</th><th class="tr">Live VAR</th><th class="tr">Combined VAR</th></tr></thead>
+        <tbody>${tableRows}</tbody>
+      </table></div>
+    </div>`;
+  buildChart(c,'combined');
+}
+
+function setWM(m){
+  ['combined','feeder','live','all'].forEach(x=>{const e=document.getElementById('tog-'+x);if(e)e.classList.toggle('active',x===m);});
+  if(currentClient)buildChart(currentClient,m);
+}
+function buildChart(c,mode){
+  const w=c.whatif;
+  const labels=w.pcts.map(p=>(p*100).toFixed(1)+'%');
+  const ctx=document.getElementById('wif-chart');
+  if(!ctx)return;
+  if(wifChart)wifChart.destroy();
+  // Use augmented VAR data (includes custom WIH positions)
+  const augmented=computeAugmentedVAR(w);
+  const augFC=augmented.map(a=>a.feederVAR);
+  const augLC=augmented.map(a=>a.liveVAR);
+  const augCB=augmented.map(a=>a.combinedVAR);
+  const ds=[];
+  if(mode==='combined'||mode==='all')ds.push({label:'Combined VAR',data:augCB,borderColor:'#c9a84c',backgroundColor:'rgba(201,168,76,0.08)',fill:mode==='combined',tension:0.4,pointRadius:0,borderWidth:2});
+  if(mode==='feeder'||mode==='all')  ds.push({label:'Feeder VAR',  data:augFC,  borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,0.06)',fill:mode==='feeder',  tension:0.4,pointRadius:0,borderWidth:2});
+  if(mode==='live'||mode==='all')    ds.push({label:'Live VAR',    data:augLC,    borderColor:'#2ecc71',backgroundColor:'rgba(46,204,113,0.06)',fill:mode==='live',    tension:0.4,pointRadius:0,borderWidth:2});
+  wifChart=new Chart(ctx,{type:'line',data:{labels,datasets:ds},options:{
+    responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{
+      legend:{labels:{color:'#7d8590',font:{family:'IBM Plex Mono',size:11}}},
+      tooltip:{backgroundColor:'#161b22',borderColor:'#3a4149',borderWidth:1,titleColor:'#c9a84c',bodyColor:'#e6edf3',
+        callbacks:{label:ctx=>` ${ctx.dataset.label}: ${f$(ctx.raw,0)}`}}
+    },
+    scales:{
+      x:{grid:{color:'#21262d'},ticks:{color:'#7d8590',font:{family:'IBM Plex Mono',size:10},maxTicksLimit:20}},
+      y:{grid:{color:'#21262d'},ticks:{color:'#7d8590',font:{family:'IBM Plex Mono',size:10},callback:v=>f$(v/1000000,1)+'M'}}
+    }
+  }});
+}
+
+// ── INIT ───────────────────────────────────────────────────
+function emptyState(title,sub){return`<div class="empty"><div class="empty-icon">📊</div><div class="empty-title">${title}</div><div style="font-size:12px;line-height:1.6;color:var(--text-muted)">${sub}</div></div>`;}
+function setInitialEmpty(){
+  ['summary','hedges','lrp','whatifhedges','whatif'].forEach(p=>{
+    document.getElementById('panel-'+p).innerHTML=emptyState('Upload Excel File','Click "⬆ Manual Upload" in the top right to load your client data file.');
+  });
+}
+setInitialEmpty();
+</script>
+</body>
+</html>

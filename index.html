@@ -12,12 +12,10 @@
   --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;
   --border2:#3a4149;--gold:#c9a84c;--green:#2ecc71;--red:#e74c3c;
   --blue:#58a6ff;--text:#e6edf3;--text-muted:#7d8590;--text-dim:#8b949e;
-  --blue-hdr:#1c5585;
+  --blue-hdr:#1c5585;--orange:#e8a838;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;min-height:100vh;}
-
-/* LOGIN */
 #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;}
 .login-box{background:var(--surface);border:1px solid var(--border2);padding:48px;width:400px;position:relative;}
 .login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);}
@@ -29,54 +27,23 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-ser
 .login-btn{width:100%;background:var(--gold);border:none;color:#000;padding:13px;font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;}
 .login-btn:hover{opacity:.85;}
 .login-error{color:var(--red);font-size:12px;margin-top:10px;display:none;}
-
-/* APP */
 #app{display:none;}
 .header{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
 .header-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:var(--gold);}
 .header-right{display:flex;align-items:center;gap:14px;}
-.header-user{font-size:11px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;}
+.upload-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--gold);padding:5px 14px;font-size:11px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;}
+.upload-btn:hover{background:var(--border2);}
 .logout-btn{background:none;border:none;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;}
+#file-input{display:none;}
 .data-status{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);display:flex;align-items:center;gap:6px;}
 .status-dot{width:7px;height:7px;border-radius:50%;background:var(--text-muted);}
 .status-dot.live{background:var(--green);}
-.status-dot.loading{background:var(--gold);animation:pulse 1s infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-
-/* TABS */
 .tabs{display:flex;padding:0 20px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;}
 .tab{padding:11px 18px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;}
 .tab.active{color:var(--gold);border-bottom-color:var(--gold);}
-.main{padding:20px;max-width:1200px;margin:0 auto;}
+.main{padding:20px;max-width:1300px;margin:0 auto;}
 .panel{display:none;}
 .panel.active{display:block;}
-
-/* ADMIN PANEL */
-.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
-.admin-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--gold);}
-.btn-primary{background:var(--gold);border:none;color:#000;padding:9px 18px;font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;}
-.btn-primary:hover{opacity:.85;}
-.btn-secondary{background:var(--surface2);border:1px solid var(--border2);color:var(--text-muted);padding:9px 18px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;cursor:pointer;}
-.btn-secondary:hover{background:var(--border2);}
-.btn-danger{background:none;border:1px solid var(--red);color:var(--red);padding:7px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;cursor:pointer;}
-.btn-danger:hover{background:rgba(231,76,60,.1);}
-.btn-small{padding:5px 12px;font-size:10px;}
-
-.clients-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:24px;}
-.client-card{background:var(--surface);border:1px solid var(--border);padding:16px;position:relative;transition:border-color .2s;}
-.client-card:hover{border-color:var(--border2);}
-.client-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
-.client-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--text);}
-.client-username{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);margin-top:2px;}
-.client-status{display:flex;align-items:center;gap:5px;font-size:10px;}
-.client-status.has-data{color:var(--green);}
-.client-status.no-data{color:var(--text-muted);}
-.client-updated{font-size:10px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;margin-bottom:12px;}
-.client-actions{display:flex;gap:6px;flex-wrap:wrap;}
-.upload-label{background:var(--gold);color:#000;padding:5px 12px;font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;display:inline-block;}
-.upload-label:hover{opacity:.85;}
-
-/* SUMMARY CARDS */
 .sum-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:22px;}
 .s-card{background:var(--surface);border:1px solid var(--border);padding:12px 14px;}
 .s-card-label{font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
@@ -85,8 +52,6 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-ser
 .s-card-val.neg{color:var(--red);}
 .s-card-val.gold{color:var(--gold);}
 .s-card-sub{font-size:10px;color:var(--text-muted);margin-top:2px;}
-
-/* TABLES */
 .sec-title{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:var(--gold);margin:20px 0 8px;border-bottom:1px solid var(--border);padding-bottom:5px;}
 .xl-wrap{overflow-x:auto;margin-bottom:6px;}
 .xl{border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:12px;}
@@ -101,13 +66,14 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-ser
 .xl td.neg{color:var(--red);}
 .xl td.dark{background:#080c12;color:#3a4560;}
 .xl td.edit{background:rgba(200,200,200,0.07);border:1px solid rgba(200,200,200,0.18) !important;}
-.xl-input{background:transparent;border:none;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:12px;width:72px;text-align:right;outline:none;padding:0;}
+.xl-input{background:transparent;border:none;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:12px;width:80px;text-align:right;outline:none;padding:0;}
 .xl-input:focus{background:rgba(201,168,76,0.1);border-radius:2px;}
 .note{font-size:11px;color:var(--text-muted);margin:4px 0 2px;font-style:italic;}
 .note-green{background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.2);color:#6de0a0;padding:3px 10px;font-size:11px;display:inline-block;margin-top:4px;}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;}
 .span-2{grid-column:span 2;}
-@media(max-width:800px){.grid-4{grid-template-columns:1fr 1fr;}.span-2{grid-column:span 2;}}
+.span-3{grid-column:span 3;}
+@media(max-width:800px){.grid-4{grid-template-columns:1fr 1fr;}.span-2{grid-column:span 2;}.span-3{grid-column:span 2;}}
 .card{background:var(--surface);border:1px solid var(--border);padding:16px;margin-bottom:14px;}
 .card-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
 .card-title::after{content:'';flex:1;height:1px;background:var(--border);}
@@ -129,6 +95,7 @@ table.gen tr:hover td{background:rgba(255,255,255,0.02);}
 .b-fut{background:rgba(255,255,255,.06);color:var(--text-dim);}
 .b-live{background:rgba(201,168,76,.1);color:var(--gold);}
 .b-feed{background:rgba(88,166,255,.1);color:var(--blue);}
+.b-wi{background:rgba(232,168,56,.15);color:var(--orange);}
 .chart-container{position:relative;height:300px;}
 .chart-controls{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
 .cht-tog{background:var(--surface2);border:1px solid var(--border2);color:var(--text-muted);padding:4px 12px;font-size:11px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;}
@@ -139,11 +106,36 @@ table.gen tr:hover td{background:rgba(255,255,255,0.02);}
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--border2);}
-
+/* What-If Hedges specific styles */
+.wih-section{background:var(--surface);border:1px solid var(--border);padding:16px;margin-bottom:14px;}
+.wih-section-title{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:var(--gold);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.wih-input-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+.wih-input-group{display:flex;flex-direction:column;gap:4px;}
+.wih-input-label{font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;}
+.wih-input{background:var(--bg);border:1px solid var(--border2);color:var(--gold);padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:13px;width:120px;outline:none;}
+.wih-input:focus{border-color:var(--gold);}
+.wih-select{background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;cursor:pointer;}
+.wih-select:focus{border-color:var(--gold);}
+.wih-btn{background:var(--gold);border:none;color:#000;padding:8px 18px;font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;align-self:flex-end;}
+.wih-btn:hover{opacity:.85;}
+.wih-btn-danger{background:none;border:1px solid var(--red);color:var(--red);padding:7px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;cursor:pointer;align-self:flex-end;}
+.wih-positions-table{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:12px;margin-top:8px;}
+.wih-positions-table th{text-align:left;padding:7px 10px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border2);background:var(--surface2);white-space:nowrap;}
+.wih-positions-table td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text-dim);white-space:nowrap;}
+.wih-positions-table td.tr{text-align:right;}
+.wih-positions-table tr.wi-row{background:rgba(232,168,56,0.05);}
+.wih-positions-table tr.wi-row td{color:var(--orange);}
+.wih-positions-table tr:hover td{background:rgba(255,255,255,0.02);}
+.wih-remove-btn{background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:0 4px;opacity:0.6;}
+.wih-remove-btn:hover{opacity:1;}
+.summary-box{background:var(--surface2);border:1px solid var(--border2);padding:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:14px;}
+.summary-item{display:flex;flex-direction:column;gap:3px;}
+.summary-item-label{font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;}
+.summary-item-val{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600;}
 /* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--surface);border:1px solid var(--border2);padding:32px;width:480px;max-width:95vw;position:relative;}
+.modal{background:var(--surface);border:1px solid var(--border2);padding:32px;width:520px;max-width:95vw;position:relative;}
 .modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);}
 .modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--gold);margin-bottom:6px;}
 .modal-sub{font-size:12px;color:var(--text-muted);margin-bottom:24px;line-height:1.6;}
@@ -151,19 +143,48 @@ table.gen tr:hover td{background:rgba(255,255,255,0.02);}
 .modal-input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:10px 12px;font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;margin-bottom:16px;}
 .modal-input:focus{border-color:var(--gold);}
 .modal-btns{display:flex;gap:10px;margin-top:4px;flex-wrap:wrap;}
-.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border2);border-left:3px solid var(--gold);padding:12px 18px;font-size:12px;font-family:'IBM Plex Mono',monospace;z-index:999;opacity:0;transform:translateY(10px);transition:all .3s;}
+.modal-btn-primary{background:var(--gold);border:none;color:#000;padding:10px 20px;font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;}
+.modal-btn-secondary{background:var(--surface2);border:1px solid var(--border2);color:var(--text-muted);padding:10px 20px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;cursor:pointer;}
+.modal-btn-danger{background:none;border:1px solid var(--red);color:var(--red);padding:10px 20px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;cursor:pointer;margin-left:auto;}
+/* ADMIN PANEL */
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.admin-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--gold);}
+.btn-primary{background:var(--gold);border:none;color:#000;padding:9px 18px;font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;}
+.btn-primary:hover{opacity:.85;}
+.btn-secondary{background:var(--surface2);border:1px solid var(--border2);color:var(--text-muted);padding:9px 18px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;cursor:pointer;}
+.btn-secondary:hover{background:var(--border2);}
+.btn-danger{background:none;border:1px solid var(--red);color:var(--red);padding:7px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;cursor:pointer;}
+.btn-danger:hover{background:rgba(231,76,60,.1);}
+.btn-small{padding:5px 12px;font-size:10px;}
+.clients-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:24px;}
+.client-card{background:var(--surface);border:1px solid var(--border);padding:16px;transition:border-color .2s;}
+.client-card:hover{border-color:var(--border2);}
+.client-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.client-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--text);}
+.client-username{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);margin-top:2px;}
+.client-status-badge{font-size:10px;}
+.client-status-badge.has-data{color:var(--green);}
+.client-status-badge.no-data{color:var(--text-muted);}
+.client-updated{font-size:10px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;margin-bottom:12px;}
+.client-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.upload-label{background:var(--gold);color:#000;padding:5px 12px;font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;display:inline-block;}
+.upload-label:hover{opacity:.85;}
+.client-selector{background:var(--surface);border:1px solid var(--border2);padding:6px 12px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-muted);}
+.client-selector strong{color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border2);border-left:3px solid var(--gold);padding:12px 18px;font-size:12px;font-family:'IBM Plex Mono',monospace;z-index:999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;}
 .toast.show{opacity:1;transform:translateY(0);}
 .toast.success{border-left-color:var(--green);}
 .toast.error{border-left-color:var(--red);}
-.spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--border2);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite;margin-right:6px;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.client-selector{background:var(--surface);border:1px solid var(--border2);padding:6px 12px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-muted);}
-.client-selector strong{color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;}
+/* STATUS DOT LOADING */
+.status-dot.loading{background:var(--gold);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+/* DISCLAIMER FOOTER */
+.disclaimer-footer{background:var(--surface);border-top:1px solid var(--border);padding:18px 24px;margin-top:40px;}
+.disclaimer-text{font-size:10px;color:var(--text-muted);line-height:1.7;max-width:1200px;margin:0 auto;font-family:'IBM Plex Sans',sans-serif;}
 </style>
 </head>
 <body>
-
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">ARC GROUP</div>
@@ -176,14 +197,12 @@ table.gen tr:hover td{background:rgba(255,255,255,0.02);}
     <div class="login-error" id="lerr">Invalid credentials. Please try again.</div>
   </div>
 </div>
-
-<!-- APP -->
 <div id="app">
   <div class="header">
     <div class="header-logo">THE ARC GROUP</div>
     <div class="header-right">
-      <div class="data-status" id="data-status"><div class="status-dot" id="status-dot"></div><span id="status-text">Ready</span></div>
-      <span class="header-user" id="header-user"></span>
+      <div class="data-status" id="data-status"><div class="status-dot" id="status-dot"></div><span id="status-text">Loading…</span></div>
+      <span id="header-user" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted)"></span>
       <button class="logout-btn" onclick="doLogout()">Sign Out</button>
     </div>
   </div>
@@ -191,13 +210,18 @@ table.gen tr:hover td{background:rgba(255,255,255,0.02);}
     <div class="tab active" onclick="showTab('summary')">Summary</div>
     <div class="tab" onclick="showTab('hedges')">Hedges</div>
     <div class="tab" onclick="showTab('lrp')">LRP</div>
+    <div class="tab" onclick="showTab('whatifhedges')">What-If Hedges</div>
     <div class="tab" onclick="showTab('whatif')">What If Analysis</div>
   </div>
   <div class="main">
     <div id="panel-summary" class="panel active"></div>
     <div id="panel-hedges" class="panel"></div>
     <div id="panel-lrp" class="panel"></div>
+    <div id="panel-whatifhedges" class="panel"></div>
     <div id="panel-whatif" class="panel"></div>
+  </div>
+  <div class="disclaimer-footer">
+    <div class="disclaimer-text">While we have made every effort to ensure that the information on this Site is sourced from reliable sources, neither The ARC Group, LLC nor Blake Koppitz is responsible for any errors or omissions, or for the results obtained from the use of this information. ALL INFORMATION IN THIS SITE IS PROVIDED "AS IS", WITH NO GUARANTEE OF COMPLETENESS, ACCURACY, TIMELINESS OR OF THE RESULTS OBTAINED FROM THE USE OF THIS INFORMATION, AND WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO WARRANTIES OF PERFORMANCE, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. Nothing herein shall to any extent substitute for the independent investigations and the sound technical and business judgment of the reader. In no event will The ARC GROUP, LLC, or its partners, employees or agents, be liable to you or anyone else for any decision made or action taken in reliance on the information in this Site or for any consequential, special or similar damages, even if advised of the possibility of such damages.</div>
   </div>
 </div>
 
@@ -213,8 +237,8 @@ table.gen tr:hover td{background:rgba(255,255,255,0.02);}
     <label class="modal-label">Password</label>
     <input class="modal-input" id="new-client-pass" placeholder="e.g. johnson2025">
     <div class="modal-btns">
-      <button class="btn-primary" onclick="saveNewClient()">Add Client</button>
-      <button class="btn-secondary" onclick="closeAddClient()">Cancel</button>
+      <button class="modal-btn-primary" onclick="saveNewClient()">Add Client</button>
+      <button class="modal-btn-secondary" onclick="closeAddClient()">Cancel</button>
     </div>
   </div>
 </div>
@@ -222,396 +246,323 @@ table.gen tr:hover td{background:rgba(255,255,255,0.02);}
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- Hidden file inputs per client (created dynamically) -->
-<div id="file-inputs" style="display:none"></div>
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────
 const JSONBIN_API_KEY = '$2a$10$cgdrlN8gPFU.Dwm/fKTAq.1H7brY3nFAQv9GWRngMeY9aZO/diMe2';
 const JSONBIN_BASE    = 'https://api.jsonbin.io/v3';
+const REGISTRY_BIN_KEY = 'arc_registry_bin_id_v1';
 
-// Master bin ID — stores the registry of all clients + their data bin IDs
-// First run creates it; subsequent runs read/update it.
-const REGISTRY_BIN_KEY = 'arc_registry_bin_id';
-
-// ── BUILT-IN USERS (admin + initial clients) ──────────────
-// Format: username -> { password, role, clientId }
-// role: 'admin' or 'client'
-// clientId links to entry in registry
-let USERS = {
-  blake:  { password:'koppitz2025',  role:'admin',  clientId:null },
-  admin:  { password:'arcadmin2025', role:'admin',  clientId:null },
-  arc:    { password:'arcgroup2025', role:'admin',  clientId:null }
+// ── BUILT-IN ADMIN USERS ──────────────────────────────────
+const ADMIN_USERS = {
+  blake: 'koppitz2025',
+  arc:   'arcgroup2025',
+  admin: 'arcadmin2025'
 };
 
 // ── STATE ─────────────────────────────────────────────────
-let currentUser   = null;
-let currentRole   = null;
-let currentClientId = null;
-let currentData   = null;  // parsed workbook data for current view
-let wifChart      = null;
-let registry      = null;  // { clients: { id: {name,username,password,binId,updatedAt} } }
-let registryBinId = null;
+let currentClient=null, wifChart=null;
+let wihExtraPositions=[];
+let currentRole=null, currentClientId=null;
+let registry=null, registryBinId=null;
+const WIH_EXTRA_KEY='arc_wih_extra_v1';
 
 // ── AUTH ──────────────────────────────────────────────────
 async function doLogin(){
-  const u = document.getElementById('lu').value.trim().toLowerCase();
-  const p = document.getElementById('lp').value;
-
-  // Check built-in users
-  if(USERS[u] && USERS[u].password === p){
-    await loginSuccess(u, USERS[u].role, null);
-    return;
+  const u=document.getElementById('lu').value.trim().toLowerCase();
+  const p=document.getElementById('lp').value;
+  // Check admin
+  if(ADMIN_USERS[u] && ADMIN_USERS[u]===p){
+    await loginSuccess(u,'admin',null); return;
   }
-
-  // Check dynamic clients from registry
+  // Check dynamic clients
   await loadRegistry();
-  if(registry && registry.clients){
-    for(const [id, client] of Object.entries(registry.clients)){
-      if(client.username === u && client.password === p){
-        await loginSuccess(u, 'client', id);
-        return;
+  if(registry&&registry.clients){
+    for(const [id,c] of Object.entries(registry.clients)){
+      if(c.username===u && c.password===p){
+        await loginSuccess(u,'client',id); return;
       }
     }
   }
-
   document.getElementById('lerr').style.display='block';
 }
 
 async function loginSuccess(username, role, clientId){
-  currentUser     = username;
-  currentRole     = role;
-  currentClientId = clientId;
-
+  currentRole=role; currentClientId=clientId;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('lerr').style.display='none';
-  document.getElementById('header-user').textContent = username.toUpperCase();
-
-  if(role === 'admin'){
-    showAdminView();
-  } else {
-    // Client: load their data
-    showClientView(clientId);
-  }
+  document.getElementById('header-user').textContent=username.toUpperCase();
+  if(role==='admin'){ showAdminView(); }
+  else { showClientView(clientId); }
 }
 
-document.addEventListener('keydown', e=>{
-  if(e.key==='Enter' && document.getElementById('login-screen').style.display!=='none') doLogin();
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.getElementById('login-screen').style.display!=='none')doLogin();
 });
 
 function doLogout(){
-  currentUser = null; currentRole = null; currentClientId = null; currentData = null;
+  currentRole=null; currentClientId=null; currentClient=null;
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('app').style.display='none';
   document.getElementById('lu').value='';
   document.getElementById('lp').value='';
-  // Reset tabs
-  showTab('summary');
+  // Reset tabs to default
+  document.getElementById('main-tabs').innerHTML=`
+    <div class="tab active" onclick="showTab('summary')">Summary</div>
+    <div class="tab" onclick="showTab('hedges')">Hedges</div>
+    <div class="tab" onclick="showTab('lrp')">LRP</div>
+    <div class="tab" onclick="showTab('whatifhedges')">What-If Hedges</div>
+    <div class="tab" onclick="showTab('whatif')">What If Analysis</div>`;
 }
 
-// ── TABS ──────────────────────────────────────────────────
-function showTab(name){
-  const tabs = ['summary','hedges','lrp','whatif'];
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active', tabs[i]===name));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('panel-'+name).classList.add('active');
-}
-
-// ── JSONBIN HELPERS ───────────────────────────────────────
-async function jbCreate(data, name=''){
-  const r = await fetch(`${JSONBIN_BASE}/b`, {
-    method:'POST',
+// ── JSONBIN ───────────────────────────────────────────────
+async function jbCreate(data,name=''){
+  const r=await fetch(`${JSONBIN_BASE}/b`,{method:'POST',
     headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_API_KEY,'X-Bin-Name':name,'X-Bin-Private':'false'},
-    body: JSON.stringify(data)
-  });
-  if(!r.ok) throw new Error('JSONBin create failed: '+r.status);
-  const j = await r.json();
-  return j.metadata.id;
+    body:JSON.stringify(data)});
+  if(!r.ok)throw new Error('JSONBin create failed: '+r.status);
+  return (await r.json()).metadata.id;
 }
-
 async function jbRead(binId){
-  const r = await fetch(`${JSONBIN_BASE}/b/${binId}/latest`, {
-    headers:{'X-Master-Key':JSONBIN_API_KEY}
-  });
-  if(!r.ok) throw new Error('JSONBin read failed: '+r.status);
-  const j = await r.json();
-  return j.record;
+  const r=await fetch(`${JSONBIN_BASE}/b/${binId}/latest`,{headers:{'X-Master-Key':JSONBIN_API_KEY}});
+  if(!r.ok)throw new Error('JSONBin read failed: '+r.status);
+  return (await r.json()).record;
 }
-
-async function jbUpdate(binId, data){
-  const r = await fetch(`${JSONBIN_BASE}/b/${binId}`, {
-    method:'PUT',
+async function jbUpdate(binId,data){
+  const r=await fetch(`${JSONBIN_BASE}/b/${binId}`,{method:'PUT',
     headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_API_KEY},
-    body: JSON.stringify(data)
-  });
-  if(!r.ok) throw new Error('JSONBin update failed: '+r.status);
+    body:JSON.stringify(data)});
+  if(!r.ok)throw new Error('JSONBin update failed: '+r.status);
 }
 
 // ── REGISTRY ─────────────────────────────────────────────
 async function loadRegistry(){
-  if(registry) return registry;
-  registryBinId = localStorage.getItem(REGISTRY_BIN_KEY);
+  if(registry)return registry;
+  registryBinId=localStorage.getItem(REGISTRY_BIN_KEY);
   if(registryBinId){
-    try{
-      registry = await jbRead(registryBinId);
-      return registry;
-    } catch(e){ console.warn('Registry read failed, will recreate'); }
+    try{ registry=await jbRead(registryBinId); return registry; }
+    catch(e){ console.warn('Registry read failed'); }
   }
-  // Create new registry
-  registry = { clients:{} };
-  registryBinId = await jbCreate(registry, 'ARC-Registry');
-  localStorage.setItem(REGISTRY_BIN_KEY, registryBinId);
+  registry={clients:{}};
+  registryBinId=await jbCreate(registry,'ARC-Registry');
+  localStorage.setItem(REGISTRY_BIN_KEY,registryBinId);
   return registry;
 }
-
 async function saveRegistry(){
   if(!registryBinId){
-    registryBinId = await jbCreate(registry, 'ARC-Registry');
-    localStorage.setItem(REGISTRY_BIN_KEY, registryBinId);
-  } else {
-    await jbUpdate(registryBinId, registry);
-  }
+    registryBinId=await jbCreate(registry,'ARC-Registry');
+    localStorage.setItem(REGISTRY_BIN_KEY,registryBinId);
+  } else { await jbUpdate(registryBinId,registry); }
 }
 
 // ── ADMIN VIEW ────────────────────────────────────────────
 async function showAdminView(){
-  // Replace tabs with admin + client tabs
-  const tabsEl = document.getElementById('main-tabs');
-  tabsEl.innerHTML = `<div class="tab active" onclick="showAdminPanel()">⚙ Admin</div>`;
-
-  // Clear panels
-  ['summary','hedges','lrp','whatif'].forEach(p=>{
+  document.getElementById('main-tabs').innerHTML=`<div class="tab active" onclick="renderAdminPanel()">⚙ Admin</div>`;
+  ['summary','hedges','lrp','whatifhedges','whatif'].forEach(p=>{
     document.getElementById('panel-'+p).innerHTML='';
     document.getElementById('panel-'+p).classList.remove('active');
   });
-
   document.getElementById('panel-summary').classList.add('active');
   await renderAdminPanel();
 }
 
 async function renderAdminPanel(){
-  updateStatus('Loading clients…', true);
+  updateStatus('Loading clients…',true);
   await loadRegistry();
-  updateStatus('Ready', false);
-
-  const clients = registry.clients || {};
-  const clientCount = Object.keys(clients).length;
-
-  const cards = Object.entries(clients).map(([id, c])=>{
-    const hasData = !!c.binId;
-    return `
-    <div class="client-card" id="card-${id}">
+  updateStatus('Ready',false);
+  const clients=registry.clients||{};
+  const count=Object.keys(clients).length;
+  const withData=Object.values(clients).filter(c=>c.binId).length;
+  const cards=Object.entries(clients).map(([id,c])=>`
+    <div class="client-card">
       <div class="client-card-top">
         <div>
           <div class="client-name">${esc(c.name)}</div>
           <div class="client-username">@${esc(c.username)}</div>
         </div>
-        <div class="client-status ${hasData?'has-data':'no-data'}">
-          ${hasData?'● Data Loaded':'○ No Data'}
-        </div>
+        <div class="client-status-badge ${c.binId?'has-data':'no-data'}">${c.binId?'● Loaded':'○ No Data'}</div>
       </div>
-      <div class="client-updated">${c.updatedAt ? 'Updated: '+c.updatedAt : 'Never uploaded'}</div>
+      <div class="client-updated">${c.updatedAt?'Updated: '+c.updatedAt:'Never uploaded'}</div>
       <div class="client-actions">
-        <label class="upload-label btn-small" for="upload-${id}">⬆ Upload Excel</label>
-        <input type="file" id="upload-${id}" accept=".xlsx,.xls" style="display:none" onchange="uploadClientFile(event,'${id}')">
-        ${hasData?`<button class="btn-secondary btn-small" onclick="viewClientData('${id}')">View Data</button>`:''}
+        <label class="upload-label btn-small" for="upl-${id}">⬆ Upload Excel</label>
+        <input type="file" id="upl-${id}" accept=".xlsx,.xls" style="display:none" onchange="uploadClientFile(event,'${id}')">
+        ${c.binId?`<button class="btn-secondary btn-small" onclick="viewClientData('${id}')">View Data</button>`:''}
         <button class="btn-danger btn-small" onclick="deleteClient('${id}')">Remove</button>
       </div>
-    </div>`;
-  }).join('');
-
-  document.getElementById('panel-summary').innerHTML = `
+    </div>`).join('');
+  document.getElementById('panel-summary').innerHTML=`
     <div class="admin-header">
       <div class="admin-title">Client Management</div>
       <button class="btn-primary" onclick="openAddClient()">+ Add Client</button>
     </div>
     <div class="sum-cards" style="margin-bottom:24px">
-      <div class="s-card"><div class="s-card-label">Total Clients</div><div class="s-card-val gold">${clientCount}</div></div>
-      <div class="s-card"><div class="s-card-label">With Data</div><div class="s-card-val pos">${Object.values(clients).filter(c=>c.binId).length}</div></div>
-      <div class="s-card"><div class="s-card-label">Pending Upload</div><div class="s-card-val" style="color:var(--text-muted)">${Object.values(clients).filter(c=>!c.binId).length}</div></div>
+      <div class="s-card"><div class="s-card-label">Total Clients</div><div class="s-card-val gold">${count}</div></div>
+      <div class="s-card"><div class="s-card-label">With Data</div><div class="s-card-val pos">${withData}</div></div>
+      <div class="s-card"><div class="s-card-label">Pending Upload</div><div class="s-card-val" style="color:var(--text-muted)">${count-withData}</div></div>
     </div>
-    ${clientCount===0
-      ? `<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">No Clients Yet</div><div style="font-size:12px;color:var(--text-muted)">Click "+ Add Client" to create your first client account.</div></div>`
-      : `<div class="clients-grid">${cards}</div>`
-    }
-  `;
+    ${count===0
+      ?`<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">No Clients Yet</div><div style="font-size:12px;color:var(--text-muted)">Click "+ Add Client" to create your first client account.</div></div>`
+      :`<div class="clients-grid">${cards}</div>`}`;
 }
 
-function showAdminPanel(){
-  renderAdminPanel();
-}
-
-// ── ADD CLIENT ────────────────────────────────────────────
-function openAddClient(){
-  document.getElementById('add-client-modal').classList.add('open');
-}
+// ── ADD / DELETE CLIENT ───────────────────────────────────
+function openAddClient(){ document.getElementById('add-client-modal').classList.add('open'); }
 function closeAddClient(){
   document.getElementById('add-client-modal').classList.remove('open');
-  document.getElementById('new-client-name').value='';
-  document.getElementById('new-client-user').value='';
-  document.getElementById('new-client-pass').value='';
+  ['new-client-name','new-client-user','new-client-pass'].forEach(id=>document.getElementById(id).value='');
 }
-
 async function saveNewClient(){
-  const name = document.getElementById('new-client-name').value.trim();
-  const user = document.getElementById('new-client-user').value.trim().toLowerCase();
-  const pass = document.getElementById('new-client-pass').value.trim();
-  if(!name||!user||!pass){ showToast('Please fill in all fields.','error'); return; }
-
-  // Check for duplicate username
-  const existing = Object.values(registry.clients||{}).find(c=>c.username===user);
-  if(existing || USERS[user]){ showToast('Username already exists.','error'); return; }
-
-  const id = 'client_'+Date.now();
-  if(!registry.clients) registry.clients={};
-  registry.clients[id] = { name, username:user, password:pass, binId:null, updatedAt:null };
-
-  updateStatus('Saving…', true);
+  const name=document.getElementById('new-client-name').value.trim();
+  const user=document.getElementById('new-client-user').value.trim().toLowerCase();
+  const pass=document.getElementById('new-client-pass').value.trim();
+  if(!name||!user||!pass){showToast('Please fill in all fields.','error');return;}
+  if(ADMIN_USERS[user]){showToast('Username already exists.','error');return;}
+  const dup=Object.values(registry.clients||{}).find(c=>c.username===user);
+  if(dup){showToast('Username already exists.','error');return;}
+  const id='client_'+Date.now();
+  if(!registry.clients)registry.clients={};
+  registry.clients[id]={name,username:user,password:pass,binId:null,updatedAt:null};
+  updateStatus('Saving…',true);
   try{
     await saveRegistry();
-    updateStatus('Saved', false);
-    showToast(name+' added successfully!','success');
+    updateStatus('Saved',false);
+    showToast(name+' added!','success');
     closeAddClient();
     renderAdminPanel();
-  } catch(e){
-    updateStatus('Error', false);
-    showToast('Failed to save: '+e.message,'error');
-  }
+  } catch(e){ updateStatus('Error',false); showToast('Failed: '+e.message,'error'); }
 }
-
-// ── DELETE CLIENT ─────────────────────────────────────────
 async function deleteClient(id){
-  const c = registry.clients[id];
-  if(!confirm(`Remove ${c.name}? This cannot be undone.`)) return;
+  const c=registry.clients[id];
+  if(!confirm(`Remove ${c.name}? This cannot be undone.`))return;
   delete registry.clients[id];
-  updateStatus('Saving…', true);
-  try{
-    await saveRegistry();
-    updateStatus('Saved', false);
-    showToast('Client removed.','success');
-    renderAdminPanel();
-  } catch(e){
-    showToast('Failed: '+e.message,'error');
-  }
+  updateStatus('Saving…',true);
+  try{ await saveRegistry(); updateStatus('Saved',false); showToast('Client removed.','success'); renderAdminPanel(); }
+  catch(e){ showToast('Failed: '+e.message,'error'); }
 }
 
 // ── UPLOAD CLIENT EXCEL ───────────────────────────────────
 async function uploadClientFile(event, clientId){
-  const file = event.target.files[0]; if(!file) return;
+  const file=event.target.files[0]; if(!file)return;
   event.target.value='';
-  const client = registry.clients[clientId];
-  updateStatus('Parsing Excel…', true);
+  const client=registry.clients[clientId];
+  updateStatus('Parsing…',true);
   showToast('Parsing '+file.name+'…');
-
-  const reader = new FileReader();
-  reader.onload = async e=>{
+  const reader=new FileReader();
+  reader.onload=async e=>{
     try{
-      const wb = XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
-      const data = parseWorkbook(wb);
-      data.clientName = client.name;
-      data.uploadDate = new Date().toLocaleDateString();
-
-      updateStatus('Uploading to cloud…', true);
-
-      if(client.binId){
-        await jbUpdate(client.binId, data);
-      } else {
-        const binId = await jbCreate(data, 'ARC-'+client.name);
-        registry.clients[clientId].binId = binId;
-      }
-      registry.clients[clientId].updatedAt = new Date().toLocaleDateString()+' '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
+      const data=parseWorkbook(wb);
+      data.clientName=client.name;
+      updateStatus('Uploading…',true);
+      if(client.binId){ await jbUpdate(client.binId,data); }
+      else { const bid=await jbCreate(data,'ARC-'+client.name); registry.clients[clientId].binId=bid; }
+      registry.clients[clientId].updatedAt=new Date().toLocaleDateString()+' '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
       await saveRegistry();
-
-      updateStatus('Uploaded ✓', false);
+      updateStatus('Uploaded ✓',false);
       showToast(client.name+' data uploaded!','success');
       renderAdminPanel();
-    } catch(err){
-      updateStatus('Error', false);
-      showToast('Upload failed: '+err.message,'error');
-      console.error(err);
-    }
+    } catch(err){ updateStatus('Error',false); showToast('Upload failed: '+err.message,'error'); console.error(err); }
   };
   reader.readAsArrayBuffer(file);
 }
 
 // ── VIEW CLIENT DATA (admin) ──────────────────────────────
 async function viewClientData(clientId){
-  const client = registry.clients[clientId];
-  updateStatus('Loading '+client.name+'…', true);
+  const client=registry.clients[clientId];
+  updateStatus('Loading '+client.name+'…',true);
   try{
-    const data = await jbRead(client.binId);
-    currentData = data;
-    // Switch to data view tabs
-    const tabsEl = document.getElementById('main-tabs');
-    tabsEl.innerHTML = `
-      <div class="tab" onclick="showAdminPanel();setupAdminTabs()">⚙ Admin</div>
+    const data=await jbRead(client.binId);
+    currentClient=data;
+    document.getElementById('main-tabs').innerHTML=`
+      <div class="tab" onclick="renderAdminPanel();setupAdminTabs()">⚙ Admin</div>
       <div class="tab active" onclick="showTab('summary')">Summary</div>
       <div class="tab" onclick="showTab('hedges')">Hedges</div>
       <div class="tab" onclick="showTab('lrp')">LRP</div>
-      <div class="tab" onclick="showTab('whatif')">What If</div>
-    `;
+      <div class="tab" onclick="showTab('whatifhedges')">What-If Hedges</div>
+      <div class="tab" onclick="showTab('whatif')">What If Analysis</div>`;
+    ['summary','hedges','lrp','whatifhedges','whatif'].forEach(p=>document.getElementById('panel-'+p).classList.remove('active'));
     document.getElementById('panel-summary').classList.add('active');
-    showTab('summary');
     renderAll(data);
-    // Add client indicator
-    const indicator = `<div class="client-selector">Viewing: <strong>${esc(client.name)}</strong> &nbsp;·&nbsp; Last updated: ${client.updatedAt||'—'}</div>`;
-    document.getElementById('panel-summary').insertAdjacentHTML('afterbegin', indicator);
-    updateStatus('Loaded: '+client.name, false);
-  } catch(err){
-    updateStatus('Error', false);
-    showToast('Failed to load data: '+err.message,'error');
-  }
+    document.getElementById('panel-summary').insertAdjacentHTML('afterbegin',
+      `<div class="client-selector">Viewing: <strong>${esc(client.name)}</strong> &nbsp;·&nbsp; Updated: ${client.updatedAt||'—'}</div>`);
+    updateStatus('Loaded: '+client.name,false);
+  } catch(err){ updateStatus('Error',false); showToast('Failed to load: '+err.message,'error'); }
 }
-
 function setupAdminTabs(){
-  const tabsEl = document.getElementById('main-tabs');
-  tabsEl.innerHTML = `<div class="tab active" onclick="showAdminPanel()">⚙ Admin</div>`;
-  document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('active');p.innerHTML='';});
+  document.getElementById('main-tabs').innerHTML=`<div class="tab active" onclick="renderAdminPanel()">⚙ Admin</div>`;
+  ['summary','hedges','lrp','whatifhedges','whatif'].forEach(p=>{document.getElementById('panel-'+p).classList.remove('active');document.getElementById('panel-'+p).innerHTML='';});
   document.getElementById('panel-summary').classList.add('active');
 }
 
 // ── CLIENT VIEW ───────────────────────────────────────────
 async function showClientView(clientId){
   await loadRegistry();
-  const client = registry.clients[clientId];
-  if(!client){ showEmptyAll('Account not found. Please contact your advisor.'); return; }
-  if(!client.binId){ showEmptyAll('Your data has not been uploaded yet.\nPlease contact your advisor.'); return; }
-
-  updateStatus('Loading your data…', true);
-  try{
-    const data = await jbRead(client.binId);
-    currentData = data;
-    renderAll(data);
-    updateStatus('Updated: '+(data.uploadDate||'—'), false);
-  } catch(err){
-    showEmptyAll('Failed to load data. Please try again or contact your advisor.');
-    updateStatus('Error loading data', false);
+  const client=registry.clients[clientId];
+  if(!client||!client.binId){
+    setInitialEmpty('Your data has not been uploaded yet. Please contact your advisor.');
+    updateStatus('No data available',false); return;
   }
-}
-
-function showEmptyAll(msg){
-  ['summary','hedges','lrp','whatif'].forEach(p=>{
-    document.getElementById('panel-'+p).innerHTML=`<div class="empty"><div class="empty-icon">📊</div><div class="empty-title">No Data</div><div style="font-size:12px;line-height:1.6;color:var(--text-muted)">${msg}</div></div>`;
-  });
+  updateStatus('Loading your data…',true);
+  try{
+    const data=await jbRead(client.binId);
+    currentClient=data;
+    try{const ex=localStorage.getItem(WIH_EXTRA_KEY);if(ex)wihExtraPositions=JSON.parse(ex);}catch(e){}
+    renderAll(data);
+    updateStatus('Updated: '+(data.uploadDate||'—'),false);
+  } catch(err){ setInitialEmpty('Failed to load data. Please try again or contact your advisor.'); updateStatus('Error',false); }
 }
 
 // ── STATUS & TOAST ────────────────────────────────────────
-function updateStatus(text, loading){
-  const dot = document.getElementById('status-dot');
-  const txt = document.getElementById('status-text');
-  if(dot) dot.className = 'status-dot'+(loading?' loading':' live');
-  if(txt) txt.textContent = text;
+function updateStatus(text,loading){
+  const dot=document.getElementById('status-dot');
+  const txt=document.getElementById('status-text');
+  if(dot)dot.className='status-dot'+(loading?' loading':' live');
+  if(txt)txt.textContent=text;
 }
 let toastTimer;
-function showToast(msg, type=''){
+function showToast(msg,type=''){
   const t=document.getElementById('toast');
   t.textContent=msg; t.className='toast show'+(type?' '+type:'');
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.className='toast',3200);
+  toastTimer=setTimeout(()=>t.className='toast',3500);
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const tabs=['summary','hedges','lrp','whatifhedges','whatif'];
+  const idx=tabs.indexOf(name);
+  const allTabs=document.querySelectorAll('.tab');
+  // Find the tab by its onclick content since admin tab is prepended
+  allTabs.forEach(t=>{if(t.getAttribute('onclick')&&t.getAttribute('onclick').includes("'"+name+"'"))t.classList.add('active');});
+  document.getElementById('panel-'+name).classList.add('active');
 }
 
-// ── EXCEL PARSERS (unchanged from original) ───────────────
+// ── BROWSER STORAGE (local fallback) ─────────────────────
+const STORAGE_KEY='arc_dashboard_data_v5';
+function saveToStorage(client){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(client));}
+  catch(e){try{sessionStorage.setItem(STORAGE_KEY,JSON.stringify(client));}catch(e2){}}
+}
+function updateStatus_old(){} // kept for compatibility
+
+
+
+// ── EXCEL LOAD ────────────────────────────────────────────
+function loadExcel(event){
+  const file=event.target.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
+    parseWorkbook(wb);
+  };
+  reader.readAsArrayBuffer(file);
+  event.target.value='';
+}
+
+// ── CELL HELPERS ──────────────────────────────────────────
 function gc(ws,row,col){
   if(!ws)return null;
   const cell=ws[XLSX.utils.encode_cell({r:row-1,c:col-1})];
@@ -629,17 +580,21 @@ function gt(ws,row,col){
   return cell.v!=null?String(cell.v):'';
 }
 
+// ── WORKBOOK PARSER ───────────────────────────────────────
 function parseWorkbook(wb){
-  const sumWs=wb.Sheets['Summary']||wb.Sheets['Summary (2)'];
-  const hedWs=wb.Sheets['Hedges'];
-  const lrpWs=wb.Sheets['LRP'];
-  const lcWifWs=wb.Sheets['Live Cattle What If'];
-  const fcWifWs=wb.Sheets['Feeder Cattle What If'];
-  const cbWifWs=wb.Sheets['Combined What If'];
-  return{
+  const sumWs  = wb.Sheets['Summary'];
+  const hedWs  = wb.Sheets['Hedges'];
+  const lrpWs  = wb.Sheets['LRP'];
+  const wihWs  = wb.Sheets['What-If Hedges'];
+  const lcWifWs= wb.Sheets['Live Cattle What If'];
+  const fcWifWs= wb.Sheets['Feeder Cattle What If'];
+  const cbWifWs= wb.Sheets['Combined What If'];
+
+  return {
     summary:     parseSummary(sumWs),
     hedges:      parseHedges(hedWs),
     lrp:         parseLRP(lrpWs),
+    wihPositions:parseWIHPositions(wihWs),
     lcPositions: parsePositions(lcWifWs,'LE'),
     fcPositions: parsePositions(fcWifWs,'GF'),
     whatif:      parseWhatIf(fcWifWs,lcWifWs,cbWifWs),
@@ -647,49 +602,77 @@ function parseWorkbook(wb){
   };
 }
 
+// ── PARSERS ───────────────────────────────────────────────
+// Summary sheet: labels in col B (col 2), data starts in col C (col 3)
 function parseSummary(ws){
   if(!ws)return{};
   return{
-    acct:gc(ws,2,2),
-    lc:{contracts:gc(ws,4,3),head:gc(ws,4,4),avgPrice:gc(ws,4,5),delta:gc(ws,4,6),
-        fut:{contracts:gc(ws,5,3),avgPrice:gc(ws,5,5)},
-        put:{contracts:gc(ws,6,3)},
-        lrp:{contracts:gc(ws,7,3),head:gc(ws,7,4),delta:gc(ws,7,6)}},
-    fc:{contracts:gc(ws,8,3),head:gc(ws,8,4),avgPrice:gc(ws,8,5),delta:gc(ws,8,6),
-        fut:{contracts:gc(ws,9,3),head:gc(ws,9,4),avgPrice:gc(ws,9,5)},
-        put:{contracts:gc(ws,10,3),head:gc(ws,10,4),avgPrice:gc(ws,10,5)},
-        lrp:{contracts:gc(ws,11,3),head:gc(ws,11,4),delta:gc(ws,11,6)}},
-    prot:{
-      head:{live:gc(ws,16,4),feeder:gc(ws,16,5),total:gc(ws,16,6),goal:gc(ws,16,7)},
-      delta:{live:gc(ws,17,4),feeder:gc(ws,17,5),total:gc(ws,17,6)}
+    acct: gc(ws,2,2),
+    lc:{
+      contracts:gc(ws,4,3), head:gc(ws,4,4), avgPrice:gc(ws,4,5), delta:gc(ws,4,6),
+      fut:{contracts:gc(ws,5,3), avgPrice:gc(ws,5,5)},
+      put:{contracts:gc(ws,6,3)},
+      lrp:{contracts:gc(ws,7,3), head:gc(ws,7,4), delta:gc(ws,7,6)}
     },
-    lc_cur:{head:gc(ws,21,4),cash:gc(ws,21,5),cashVal:gc(ws,21,7),openHedge:gc(ws,21,8),netPrice:gc(ws,21,9)},
-    lc_wi: {head:gc(ws,22,4),cash:gc(ws,22,5),fut:gc(ws,22,6),cashVal:gc(ws,22,7),openHedge:gc(ws,22,8),netPrice:gc(ws,22,9)},
-    lc_wt: {weight:gc(ws,23,5),hedgeDiff:gc(ws,23,8),var:gc(ws,23,9)},
-    fc_cur:{head:gc(ws,27,4),cash:gc(ws,27,5),cashVal:gc(ws,27,7),openHedge:gc(ws,27,8),netPrice:gc(ws,27,9)},
-    fc_wi: {head:gc(ws,28,4),cash:gc(ws,28,5),fut:gc(ws,28,6),cashVal:gc(ws,28,7),openHedge:gc(ws,28,8),netPrice:gc(ws,28,9)},
-    fc_wt: {weight:gc(ws,29,5),hedgeDiff:gc(ws,29,8),var:gc(ws,29,9)}
+    fc:{
+      contracts:gc(ws,8,3), head:gc(ws,8,4), avgPrice:gc(ws,8,5), delta:gc(ws,8,6),
+      fut:{contracts:gc(ws,9,3), head:gc(ws,9,4), avgPrice:gc(ws,9,5)},
+      put:{contracts:gc(ws,10,3), head:gc(ws,10,4), avgPrice:gc(ws,10,5)},
+      lrp:{contracts:gc(ws,11,3), head:gc(ws,11,4), avgPrice:gc(ws,11,5), delta:gc(ws,11,6)}
+    },
+    prot:{
+      head:{live:gc(ws,16,4), feeder:gc(ws,16,5), total:gc(ws,16,6), goal:gc(ws,16,7)},
+      delta:{live:gc(ws,17,4), feeder:gc(ws,17,5), total:gc(ws,17,6)}
+    },
+    // Row 19=LIVE CATTLE header, row 20=column headers, row 21=Current Inventory
+    lc_cur:{head:gc(ws,21,4), cash:gc(ws,21,5), cashVal:gc(ws,21,7), openHedge:gc(ws,21,8), netPrice:gc(ws,21,9)},
+    lc_wi: {head:gc(ws,22,4), cash:gc(ws,22,5), fut:gc(ws,22,6), cashVal:gc(ws,22,7), openHedge:gc(ws,22,8), netPrice:gc(ws,22,9)},
+    lc_wt: {weight:gc(ws,23,5), hedgeDiff:gc(ws,23,8), var:gc(ws,23,9)},
+    // Row 25=FEEDER CATTLE header, row 26=column headers, row 27=Current Inventory
+    fc_cur:{head:gc(ws,27,4), cash:gc(ws,27,5), cashVal:gc(ws,27,7), openHedge:gc(ws,27,8), netPrice:gc(ws,27,9)},
+    fc_wi: {head:gc(ws,28,4), cash:gc(ws,28,5), fut:gc(ws,28,6), cashVal:gc(ws,28,7), openHedge:gc(ws,28,8), netPrice:gc(ws,28,9)},
+    fc_wt: {weight:gc(ws,29,5), hedgeDiff:gc(ws,29,8), var:gc(ws,29,9)}
   };
 }
 
 function parseHedges(ws){
   if(!ws)return{openPL:0,rows:[]};
+  // Row 1: account number in col 1, "ADMIS HEDGES" in col 3, "Open P/L" in col 7, value in col 8
+  // Row 2: column headers
+  // Data starts row 3
   const openPL=gc(ws,1,8);
   const rows=[];
   const rng=XLSX.utils.decode_range(ws['!ref']||'A1:W1');
   for(let r=3;r<=rng.e.r+1;r++){
-    const desc=gc(ws,r,3),contract=gc(ws,r,10);
-    if(!desc&&!contract)continue;
-    rows.push({date:gt(ws,r,1),bs:gc(ws,r,2),desc,contracts:gc(ws,r,4),
-      size:gc(ws,r,5),enterPrice:gc(ws,r,6),currPrice:gc(ws,r,7),
-      openPL:gc(ws,r,8),contract,type:gc(ws,r,11),strike:gc(ws,r,12),cattleType:gc(ws,r,13)});
+    const desc=gc(ws,r,3), date=gc(ws,r,1);
+    if(!desc&&!date)continue;
+    if(typeof date==='string'&&date==='Date')continue; // skip extra header rows
+    rows.push({
+      date: gt(ws,r,1),
+      bs: gc(ws,r,2),
+      desc,
+      contracts: gc(ws,r,4),
+      size: gc(ws,r,5),
+      enterPrice: gc(ws,r,6),
+      currPrice: gc(ws,r,7),
+      openPL: gc(ws,r,8),
+      contract: gc(ws,r,10),
+      type: gc(ws,r,11),
+      strike: gc(ws,r,12),
+      cattleType: gc(ws,r,13)
+    });
   }
   return{openPL,rows};
 }
 
 function parseLRP(ws){
-  if(!ws)return{openPL:0,rows:[]};
-  const openPL=gc(ws,2,14);
+  if(!ws)return{totalCost:0,rows:[]};
+  // Row 1: "Livestock Risk Protection" in col 6
+  // Row 2: account, total contracts (col 9), total cost (col 13)
+  // Row 3: headers
+  // Data starts row 4
+  const totalContracts=gc(ws,2,9);
+  const totalCost=gc(ws,2,13);
   const rows=[];
   const rng=XLSX.utils.decode_range(ws['!ref']||'A1:P1');
   for(let r=4;r<=rng.e.r+1;r++){
@@ -697,13 +680,58 @@ function parseLRP(ws){
     const head=gc(ws,r,7);
     if(!dateVal||!head)continue;
     rows.push({
-      date:gt(ws,r,1),bs:gc(ws,r,2),desc:gc(ws,r,3),contract:gc(ws,r,4),
-      type:gc(ws,r,5),strike:gc(ws,r,6),head,typeCode:gc(ws,r,8),
-      contracts:gc(ws,r,9),weight:gc(ws,r,10),totalCost:gc(ws,r,11),
-      priceCwt:gc(ws,r,12),currPrice:gc(ws,r,13),openPL:gc(ws,r,14),cattleType:gc(ws,r,15)
+      date: gt(ws,r,1),
+      bs: gc(ws,r,2),
+      desc: gc(ws,r,3),
+      contract: gc(ws,r,4),
+      type: gc(ws,r,5),
+      strike: gc(ws,r,6),
+      head,
+      typeCode: gc(ws,r,8),
+      contracts: gc(ws,r,9),
+      weight: gc(ws,r,10),
+      totalCostStr: gc(ws,r,11),
+      priceCwt: gc(ws,r,12),
+      totalCost: gc(ws,r,13),
+      cattleType: gc(ws,r,14)
     });
   }
-  return{openPL,rows};
+  return{totalContracts,totalCost,rows};
+}
+
+// Parse What-If Hedges sheet positions (cols A-K, rows 2+)
+function parseWIHPositions(ws){
+  if(!ws)return[];
+  const positions=[];
+  const rng=XLSX.utils.decode_range(ws['!ref']||'A1:V1');
+  for(let r=2;r<=Math.min(rng.e.r+1,100);r++){
+    const bs=gc(ws,r,1);
+    const desc=gc(ws,r,2);
+    const typeStr=gc(ws,r,3);
+    const contracts=gc(ws,r,4);
+    const size=gc(ws,r,5);
+    const strike=gc(ws,r,6);
+    const enterPrice=gc(ws,r,7);
+    if(!bs&&!desc)continue;
+    // Contract / type from right side
+    const contract=gc(ws,r,9);
+    const optType=gc(ws,r,10);
+    const optStrike=gc(ws,r,11);
+    const cattleType=gc(ws,r,12);
+    positions.push({
+      bs: bs||'Sell',
+      desc: desc||'',
+      typeStr: typeStr||optType||'Futures',
+      contracts: contracts||0,
+      size: size||500,
+      strike: optStrike||strike||0,
+      enterPrice: enterPrice||0,
+      contract: contract||'',
+      cattleType: cattleType||'Feeder',
+      isFromSheet: true
+    });
+  }
+  return positions;
 }
 
 function parsePositions(ws,filterType){
@@ -716,7 +744,8 @@ function parsePositions(ws,filterType){
     const J=gc(ws,r,10);
     if(J&&J>0)continue;
     const Q=gc(ws,r,17);
-    const F=gc(ws,r,6),G=gc(ws,r,7),H=gc(ws,r,8),I=gc(ws,r,9);
+    const G=gc(ws,r,7),H=gc(ws,r,8),I=gc(ws,r,9);
+    const F=gc(ws,r,6);
     const S=gc(ws,r,19)||0,T=gc(ws,r,20)||0,U=gc(ws,r,21)||0,V=gc(ws,r,22)||0;
     if(!Q||!G||!H)continue;
     positions.push({type:Q.trim(),strike:F,contracts:G,size:H,entryPrice:I,premium:(S+T+U+V)});
@@ -738,11 +767,11 @@ function parseWhatIf(fcWs,lcWs,cbWs){
   return r;
 }
 
-// ── VAR ───────────────────────────────────────────────────
+// ── VAR CALCULATION ────────────────────────────────────────
 function positionPL(pos,price){
   const{type,strike,contracts,size,entryPrice,premium}=pos;
   let pl=0;
-  const t=type.toLowerCase();
+  const t=(type||'').toLowerCase().replace(/\s+/g,' ').trim();
   if(t==='sell futures')     pl=entryPrice-price;
   else if(t==='buy futures') pl=price-entryPrice;
   else if(t==='buy put')     pl=price<strike?strike-price:0;
@@ -752,7 +781,7 @@ function positionPL(pos,price){
   return(premium+pl)*contracts*size;
 }
 
-// ── FORMAT ────────────────────────────────────────────────
+// ── FORMAT ─────────────────────────────────────────────────
 function f$(v,d=2){
   if(v==null||v===''||isNaN(v))return'—';
   const n=Number(v),abs=Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -762,42 +791,35 @@ function fN(v,d=2){if(v==null||v===''||isNaN(v))return'—';return Number(v).toL
 function fP(v){return(v==null||isNaN(v))?'—':(Number(v)*100).toFixed(1)+'%';}
 function nc(v){return(v!=null&&!isNaN(v)&&Number(v)<0)?'neg':'';}
 function tc(v){return(v!=null&&!isNaN(v))?Number(v)<0?'tn':Number(v)>0?'tp':'':'';}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-// ── RENDER ALL ────────────────────────────────────────────
-function renderAll(c){renderSummary(c);renderHedges(c);renderLRP(c);renderWhatIf(c);}
+function renderAll(c){renderSummary(c);renderHedges(c);renderLRP(c);renderWhatIfHedges(c);renderWhatIf(c);}
 
-// ── SUMMARY ───────────────────────────────────────────────
+// ── SUMMARY ────────────────────────────────────────────────
 function renderSummary(c){
-  const s=c.summary||{};
+  const s=c.summary;
   const lc=s.lc||{},fc=s.fc||{};
   const ph=(s.prot||{}).head||{},pd=(s.prot||{}).delta||{};
   const lcr=s.lc_cur||{},lwi=s.lc_wi||{},lwt=s.lc_wt||{};
   const fcr=s.fc_cur||{},fwi=s.fc_wi||{},fwt=s.fc_wt||{};
   const hpl=c.hedges?c.hedges.openPL:null;
-  const lpl=c.lrp?c.lrp.openPL:null;
+  const lrpTotalCost=c.lrp?c.lrp.totalCost:null;
 
   document.getElementById('panel-summary').innerHTML=`
-  <div class="sum-cards">
-    <div class="s-card"><div class="s-card-label">Hedge Open P/L</div><div class="s-card-val ${hpl!=null&&hpl<0?'neg':'pos'}">${f$(hpl)}</div><div class="s-card-sub">ADMIS Futures &amp; Options</div></div>
-    <div class="s-card"><div class="s-card-label">LRP Open P/L</div><div class="s-card-val ${lpl!=null&&lpl<0?'neg':'pos'}">${f$(lpl)}</div><div class="s-card-sub">Livestock Risk Protection</div></div>
-    <div class="s-card"><div class="s-card-label">Live Contracts</div><div class="s-card-val gold">${fN(lc.contracts,0)||'—'}</div><div class="s-card-sub">${fN(lc.head,0)} head</div></div>
-    <div class="s-card"><div class="s-card-label">Feeder Contracts</div><div class="s-card-val gold">${fN(fc.contracts,0)||'—'}</div><div class="s-card-sub">${fN(fc.head,0)} head</div></div>
-  </div>
   <div class="sec-title">Contracts</div>
   <div class="xl-wrap"><table class="xl">
     <thead><tr><th style="text-align:left;width:120px"></th><th>Contracts</th><th>Head</th><th>Avg. Price</th><th>Delta</th></tr></thead>
     <tbody>
-      <tr><td class="lbl">Live Cattle</td><td>${fN(lc.contracts,2)}</td><td>${fN(lc.head,0)}</td><td>$ ${fN(lc.avgPrice,2)}</td><td>${lc.delta!=null?fN(lc.delta,1)+' head':'—'}</td></tr>
-      <tr><td class="sub">Futures</td><td>${fN(lc.fut?.contracts,0)}</td><td></td><td>$ ${fN(lc.fut?.avgPrice,2)}</td><td></td></tr>
+      <tr><td class="lbl">Live Cattle</td><td>${fN(lc.contracts,0)}</td><td>${fN(lc.head,0)}</td><td>$ ${fN(lc.avgPrice,3)}</td><td>${lc.delta!=null?fN(lc.delta,2)+' head':'—'}</td></tr>
+      <tr><td class="sub">Futures</td><td>${fN(lc.fut?.contracts,0)}</td><td></td><td>$ ${fN(lc.fut?.avgPrice,3)}</td><td></td></tr>
       <tr><td class="sub">Puts</td><td>${fN(lc.put?.contracts,0)}</td><td></td><td></td><td></td></tr>
-      <tr><td class="sub">LRP</td><td>${fN(lc.lrp?.contracts,1)}</td><td>${fN(lc.lrp?.head,0)}</td><td></td><td>${lc.lrp?.delta!=null?fN(lc.lrp.delta,1):'—'}</td></tr>
-      <tr><td class="lbl">Feeders</td><td>${fN(fc.contracts,2)}</td><td>${fN(fc.head,0)}</td><td>$ ${fN(fc.avgPrice,2)}</td><td>${fc.delta!=null?fN(fc.delta,1)+' head':'—'}</td></tr>
-      <tr><td class="sub">Futures</td><td>${fN(fc.fut?.contracts,1)}</td><td>${fN(fc.fut?.head,0)}</td><td>$ ${fN(fc.fut?.avgPrice,2)}</td><td></td></tr>
-      <tr><td class="sub">Puts</td><td>${fN(fc.put?.contracts,0)}</td><td>${fN(fc.put?.head,0)}</td><td>$ ${fN(fc.put?.avgPrice,2)}</td><td></td></tr>
-      <tr><td class="sub">LRP</td><td>${fN(fc.lrp?.contracts,1)}</td><td>${fN(fc.lrp?.head,0)}</td><td></td><td>${fc.lrp?.delta!=null?fN(fc.lrp.delta,1):'—'}</td></tr>
+      <tr><td class="sub">LRP</td><td>${fN(lc.lrp?.contracts,2)}</td><td>${fN(lc.lrp?.head,0)}</td><td></td><td>${lc.lrp?.delta!=null?fN(lc.lrp.delta,2):'—'}</td></tr>
+      <tr><td class="lbl">Feeders</td><td>${fN(fc.contracts,2)}</td><td>${fN(fc.head,0)}</td><td>$ ${fN(fc.avgPrice,3)}</td><td>${fc.delta!=null?fN(fc.delta,2)+' head':'—'}</td></tr>
+      <tr><td class="sub">Futures</td><td>${fN(fc.fut?.contracts,0)}</td><td>${fN(fc.fut?.head,0)}</td><td>$ ${fN(fc.fut?.avgPrice,3)}</td><td></td></tr>
+      <tr><td class="sub">Puts</td><td>${fN(fc.put?.contracts,0)}</td><td>${fN(fc.put?.head,0)}</td><td>$ ${fN(fc.put?.avgPrice,3)}</td><td></td></tr>
+      <tr><td class="sub">LRP</td><td>${fN(fc.lrp?.contracts,2)}</td><td>${fN(fc.lrp?.head,0)}</td><td>$ ${fN(fc.lrp?.avgPrice,3)}</td><td>${fc.lrp?.delta!=null?fN(fc.lrp.delta,2):'—'}</td></tr>
     </tbody>
   </table></div>
+
   <div class="sec-title">Percent Protected</div>
   <div class="xl-wrap"><table class="xl" style="width:auto">
     <thead><tr><th style="width:80px"></th><th>Live</th><th>Feeder</th><th>Total</th><th>Goal</th></tr></thead>
@@ -806,10 +828,11 @@ function renderSummary(c){
       <tr><td class="lbl">Delta</td><td>${fP(pd.live)}</td><td>${fP(pd.feeder)}</td><td>${fP(pd.total)}</td><td></td></tr>
     </tbody>
   </table></div>
+
   <div class="xl-wrap" style="margin-top:20px"><table class="xl" style="width:auto">
     <thead>
       <tr><td colspan="7" class="hdr">LIVE CATTLE</td></tr>
-      <tr><th style="width:150px;text-align:left"></th><th>Head</th><th>Cash</th><th>Futures</th><th>Cash Value</th><th>Open Hedges</th><th>Net Price</th></tr>
+      <tr><th style="width:160px;text-align:left"></th><th>Head</th><th>Cash</th><th>Futures</th><th>Cash Value</th><th>Open Hedges</th><th>Net Price</th></tr>
     </thead>
     <tbody>
       <tr>
@@ -831,7 +854,7 @@ function renderSummary(c){
         <td id="lc_np_wi">$ ${fN(lwi.netPrice,3)}</td>
       </tr>
       <tr>
-        <td class="sub">Weight</td>
+        <td class="sub">Weight (lbs)</td>
         <td class="edit"><input class="xl-input" id="lc_weight" type="number" value="${lwt.weight??''}" oninput="recalcAll()"></td>
         <td></td><td></td><td>$ —</td>
         <td id="lc_hedge_diff" class="${nc(lwt.hedgeDiff)}">${f$(lwt.hedgeDiff,0)}</td>
@@ -841,10 +864,11 @@ function renderSummary(c){
   </table></div>
   <div class="note">* You can change the values in the gray cells.</div>
   <div class="note-green">$$ — Current Futures Price is marked-to-market at recent prices</div>
+
   <div class="xl-wrap" style="margin-top:22px"><table class="xl" style="width:auto">
     <thead>
       <tr><td colspan="7" class="hdr">FEEDER CATTLE</td></tr>
-      <tr><th style="width:150px;text-align:left"></th><th>Head</th><th>Cash</th><th>Futures</th><th>Cash Value</th><th>Open Hedges</th><th>Net Price</th></tr>
+      <tr><th style="width:160px;text-align:left"></th><th>Head</th><th>Cash</th><th>Futures</th><th>Cash Value</th><th>Open Hedges</th><th>Net Price</th></tr>
     </thead>
     <tbody>
       <tr>
@@ -866,7 +890,7 @@ function renderSummary(c){
         <td id="fc_np_wi">$ ${fN(fwi.netPrice,3)}</td>
       </tr>
       <tr>
-        <td class="sub">Weight</td>
+        <td class="sub">Weight (lbs)</td>
         <td class="edit"><input class="xl-input" id="fc_weight" type="number" value="${fwt.weight??''}" oninput="recalcAll()"></td>
         <td></td><td></td><td>$ —</td>
         <td id="fc_hedge_diff" class="${nc(fwt.hedgeDiff)}">${f$(fwt.hedgeDiff,0)}</td>
@@ -880,8 +904,19 @@ function renderSummary(c){
   recalcAll();
 }
 
+// ── RECALCULATE ────────────────────────────────────────────
+// Converts a wihExtraPosition into the same format positionPL() expects
+function wihPosToPL(p, price){
+  // type string: "buy futures", "sell put", etc.
+  const typeStr=(p.bs==='Buy'?'buy ':'sell ')+(p.type||'futures').toLowerCase();
+  const pos={type:typeStr, strike:p.strike||0, contracts:p.contracts||0, size:p.size||0, entryPrice:p.enterPrice||0, premium:0};
+  return positionPL(pos, price);
+}
+
 function recalcAll(){
-  if(!currentData)return;
+  if(!currentClient)return;
+  const c = currentClient;
+  // LIVE
   const lcHC=parseFloat(document.getElementById('lc_head_cur')?.value)||0;
   const lcCC=parseFloat(document.getElementById('lc_cash_cur')?.value)||0;
   const lcHW=parseFloat(document.getElementById('lc_head_wi')?.value)||0;
@@ -889,10 +924,14 @@ function recalcAll(){
   const lcFW=parseFloat(document.getElementById('lc_fut_wi')?.value)||0;
   const lcWt=parseFloat(document.getElementById('lc_weight')?.value)||0;
   const lcCwt=lcWt/100;
-  const lcOHCur=currentData.summary?.lc_cur?.openHedge||0;
+  const lcOHCur=currentClient.summary.lc_cur?.openHedge||0;
   const lcCVCur=lcHC*lcCC*lcCwt;
   const lcCVWI=lcHW*lcCW*lcCwt;
-  const lcOHWI=(currentData.lcPositions||[]).reduce((s,p)=>s+positionPL(p,lcFW),0);
+  // Base positions from What-If sheets
+  const lcOHWI_base=currentClient.lcPositions.reduce((s,p)=>s+positionPL(p,lcFW),0);
+  // Add custom WIH positions for Live Cattle
+  const lcOHWI_custom=wihExtraPositions.filter(p=>p.cattleType==='Live').reduce((s,p)=>s+wihPosToPL(p,lcFW),0);
+  const lcOHWI=lcOHWI_base+lcOHWI_custom;
   const lcNPCur=lcHC>0&&lcCwt>0?(lcCVCur+lcOHCur)/(lcHC*lcCwt):0;
   const lcNPWI=lcHW>0&&lcCwt>0?(lcCVWI+lcOHWI)/(lcHW*lcCwt):0;
   const lcHD=lcOHWI-lcOHCur;
@@ -905,6 +944,7 @@ function recalcAll(){
   setEl('lc_np_wi','$ '+fN(lcNPWI,3));
   setEl('lc_hedge_diff',f$(lcHD,0),nc(lcHD));
   setEl('lc_var',f$(lcVAR,0),'yel');
+  // FEEDER
   const fcHC=parseFloat(document.getElementById('fc_head_cur')?.value)||0;
   const fcCC=parseFloat(document.getElementById('fc_cash_cur')?.value)||0;
   const fcHW=parseFloat(document.getElementById('fc_head_wi')?.value)||0;
@@ -912,10 +952,14 @@ function recalcAll(){
   const fcFW=parseFloat(document.getElementById('fc_fut_wi')?.value)||0;
   const fcWt=parseFloat(document.getElementById('fc_weight')?.value)||0;
   const fcCwt=fcWt/100;
-  const fcOHCur=currentData.summary?.fc_cur?.openHedge||0;
+  const fcOHCur=currentClient.summary.fc_cur?.openHedge||0;
   const fcCVCur=fcHC*fcCC*fcCwt;
   const fcCVWI=fcHW*fcCW*fcCwt;
-  const fcOHWI=(currentData.fcPositions||[]).reduce((s,p)=>s+positionPL(p,fcFW),0);
+  // Base positions from What-If sheets
+  const fcOHWI_base=currentClient.fcPositions.reduce((s,p)=>s+positionPL(p,fcFW),0);
+  // Add custom WIH positions for Feeder Cattle
+  const fcOHWI_custom=wihExtraPositions.filter(p=>p.cattleType==='Feeder').reduce((s,p)=>s+wihPosToPL(p,fcFW),0);
+  const fcOHWI=fcOHWI_base+fcOHWI_custom;
   const fcNPCur=fcHC>0&&fcCwt>0?(fcCVCur+fcOHCur)/(fcHC*fcCwt):0;
   const fcNPWI=fcHW>0&&fcCwt>0?(fcCVWI+fcOHWI)/(fcHW*fcCwt):0;
   const fcHD=fcOHWI-fcOHCur;
@@ -931,58 +975,386 @@ function recalcAll(){
 }
 function setEl(id,txt,cls){const el=document.getElementById(id);if(!el)return;el.textContent=txt;if(cls!==undefined)el.className=cls;}
 
-// ── HEDGES ────────────────────────────────────────────────
+// ── HEDGES ─────────────────────────────────────────────────
 function renderHedges(c){
   const h=c.hedges;
-  if(!h||!h.rows||!h.rows.length){document.getElementById('panel-hedges').innerHTML=emptyState('No Hedge Data','No hedge positions found in this file.');return;}
+  if(!h||!h.rows.length){document.getElementById('panel-hedges').innerHTML=emptyState('No Hedge Data','Upload an Excel file to view ADMIS hedge positions.');return;}
   const rows=h.rows.filter(r=>r.desc||r.contract);
-  const tbody=rows.map(r=>{
-    const bsCls=r.bs==='Buy'?'b-buy':'b-sell';
-    const tCls=r.type==='Put'?'b-put':r.type==='Call'?'b-call':'b-fut';
-    const catCls=r.cattleType==='Live'?'b-live':r.cattleType==='Feeder'?'b-feed':'';
-    return`<tr><td>${r.date||''}</td><td><span class="badge ${bsCls}">${r.bs||''}</span></td><td>${r.desc||''}</td><td class="tr">${r.contracts||''}</td><td class="tr">${r.size||''}</td><td class="tr">${fN(r.enterPrice,3)}</td><td class="tr">${fN(r.currPrice,3)}</td><td class="tr ${tc(r.openPL)}">${f$(r.openPL)}</td><td>${r.contract||''}</td><td><span class="badge ${tCls}">${r.type||''}</span></td><td class="tr">${r.strike||''}</td><td>${r.cattleType?`<span class="badge ${catCls}">${r.cattleType}</span>`:''}</td></tr>`;
-  }).join('');
+  // Split by cattle type
+  const liveRows=rows.filter(r=>r.cattleType==='Live'||(!r.cattleType&&r.contract&&r.contract.startsWith('LE')));
+  const feederRows=rows.filter(r=>r.cattleType==='Feeder'||(!r.cattleType&&r.contract&&r.contract.startsWith('GF')));
+  const otherRows=rows.filter(r=>!liveRows.includes(r)&&!feederRows.includes(r));
+
+  function makeRows(arr){
+    return arr.map(r=>{
+      const bsCls=r.bs==='Buy'?'b-buy':'b-sell';
+      const tCls=r.type==='Put'?'b-put':r.type==='Call'?'b-call':'b-fut';
+      const catCls=r.cattleType==='Live'?'b-live':r.cattleType==='Feeder'?'b-feed':'b-fut';
+      return`<tr>
+        <td>${r.date||''}</td>
+        <td><span class="badge ${bsCls}">${r.bs||''}</span></td>
+        <td style="text-align:left;font-family:'IBM Plex Sans',sans-serif">${r.desc||''}</td>
+        <td class="tr">${r.contracts!=null?fN(r.contracts,0):'—'}</td>
+        <td class="tr">${r.size!=null?fN(r.size,0):'—'}</td>
+        <td class="tr">${fN(r.enterPrice,3)}</td>
+        <td class="tr">${fN(r.currPrice,3)}</td>
+        <td class="tr ${tc(r.openPL)}">${f$(r.openPL)}</td>
+        <td>${r.contract||''}</td>
+        <td><span class="badge ${tCls}">${r.type||''}</span></td>
+        <td class="tr">${r.strike||''}</td>
+        <td>${r.cattleType?`<span class="badge ${catCls}">${r.cattleType}</span>`:''}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  const livePL=liveRows.reduce((s,r)=>s+(r.openPL||0),0);
+  const feederPL=feederRows.reduce((s,r)=>s+(r.openPL||0),0);
+
   document.getElementById('panel-hedges').innerHTML=`
-    <div class="grid-4"><div class="card span-2"><div class="card-title">ADMIS — Total Open P/L</div><div class="stat-val ${h.openPL<0?'neg':'pos'}">${f$(h.openPL)}</div></div><div class="card"><div class="card-title">Total Positions</div><div class="stat-val">${rows.length}</div></div></div>
-    <div class="card"><div class="card-title">Hedge Positions</div><div class="tbl-wrap"><table class="gen"><thead><tr><th>Date</th><th>B/S</th><th>Description</th><th class="tr">Contracts</th><th class="tr">Size</th><th class="tr">Enter $</th><th class="tr">Current $</th><th class="tr">Open P/L</th><th>Contract</th><th>Type</th><th class="tr">Strike</th><th>Category</th></tr></thead><tbody>${tbody}</tbody></table></div></div>`;
+    <div class="grid-4">
+      <div class="card span-2"><div class="card-title">ADMIS — Total Open P/L</div><div class="stat-val ${h.openPL<0?'neg':'pos'}">${f$(h.openPL)}</div></div>
+      <div class="card"><div class="card-title">Live Cattle P/L</div><div class="stat-val ${livePL<0?'neg':'pos'}">${f$(livePL)}</div></div>
+      <div class="card"><div class="card-title">Feeder Cattle P/L</div><div class="stat-val ${feederPL<0?'neg':'pos'}">${f$(feederPL)}</div></div>
+    </div>
+    ${liveRows.length?`
+    <div class="card">
+      <div class="card-title">Live Cattle Positions (${liveRows.length})</div>
+      <div class="tbl-wrap"><table class="gen">
+        <thead><tr><th>Date</th><th>B/S</th><th>Description</th><th class="tr">Contracts</th><th class="tr">Size</th><th class="tr">Enter $</th><th class="tr">Current $</th><th class="tr">Open P/L</th><th>Contract</th><th>Type</th><th class="tr">Strike</th><th>Category</th></tr></thead>
+        <tbody>${makeRows(liveRows)}</tbody>
+      </table></div>
+    </div>`:''}
+    ${feederRows.length?`
+    <div class="card">
+      <div class="card-title">Feeder Cattle Positions (${feederRows.length})</div>
+      <div class="tbl-wrap"><table class="gen">
+        <thead><tr><th>Date</th><th>B/S</th><th>Description</th><th class="tr">Contracts</th><th class="tr">Size</th><th class="tr">Enter $</th><th class="tr">Current $</th><th class="tr">Open P/L</th><th>Contract</th><th>Type</th><th class="tr">Strike</th><th>Category</th></tr></thead>
+        <tbody>${makeRows(feederRows)}</tbody>
+      </table></div>
+    </div>`:''}
+    ${otherRows.length?`
+    <div class="card">
+      <div class="card-title">Other Positions (${otherRows.length})</div>
+      <div class="tbl-wrap"><table class="gen">
+        <thead><tr><th>Date</th><th>B/S</th><th>Description</th><th class="tr">Contracts</th><th class="tr">Size</th><th class="tr">Enter $</th><th class="tr">Current $</th><th class="tr">Open P/L</th><th>Contract</th><th>Type</th><th class="tr">Strike</th><th>Category</th></tr></thead>
+        <tbody>${makeRows(otherRows)}</tbody>
+      </table></div>
+    </div>`:''}`;
 }
 
-// ── LRP ───────────────────────────────────────────────────
+// ── LRP ────────────────────────────────────────────────────
 function renderLRP(c){
   const l=c.lrp;
-  if(!l||!l.rows||!l.rows.length){document.getElementById('panel-lrp').innerHTML=emptyState('No LRP Data','No LRP policies found in this file.');return;}
+  if(!l||!l.rows||!l.rows.length){document.getElementById('panel-lrp').innerHTML=emptyState('No LRP Data','Upload an Excel file to view LRP policies.');return;}
   const tbody=l.rows.map(r=>{
     const catCls=r.cattleType==='Live'?'b-live':r.cattleType==='Feeder'?'b-feed':'';
-    return`<tr><td>${r.date||''}</td><td>${r.contract||''}</td><td>${r.type||''}</td><td class="tr">${fN(r.strike,2)}</td><td class="tr">${fN(r.head,0)}</td><td>${r.typeCode||''}</td><td class="tr">${fN(r.contracts,2)}</td><td class="tr">${fN(r.weight,0)}</td><td class="tr">${r.totalCost||''}</td><td class="tr">${fN(r.priceCwt,3)}</td><td class="tr">${fN(r.currPrice,2)}</td><td class="tr ${tc(r.openPL)}">${f$(r.openPL,2)}</td><td>${r.cattleType?`<span class="badge ${catCls}">${r.cattleType}</span>`:''}</td></tr>`;
+    return`<tr>
+      <td>${r.date||''}</td>
+      <td>${r.contract||''}</td>
+      <td>${r.type||''}</td>
+      <td class="tr">${fN(r.strike,2)}</td>
+      <td class="tr">${fN(r.head,0)}</td>
+      <td>${r.typeCode||''}</td>
+      <td class="tr">${fN(r.contracts,2)}</td>
+      <td class="tr">${fN(r.weight,0)}</td>
+      <td class="tr">${r.totalCostStr||''}</td>
+      <td class="tr">${fN(r.priceCwt,3)}</td>
+      <td class="tr ${tc(-1)}">${f$(r.totalCost,0)}</td>
+      <td>${r.cattleType?`<span class="badge ${catCls}">${r.cattleType}</span>`:''}</td>
+    </tr>`;
   }).join('');
+
+  const totalHead=l.rows.reduce((s,r)=>s+(r.head||0),0);
+  const totalContracts=l.totalContracts||l.rows.reduce((s,r)=>s+(r.contracts||0),0);
+  const totalCost=l.totalCost||l.rows.reduce((s,r)=>s+(r.totalCost||0),0);
+
   document.getElementById('panel-lrp').innerHTML=`
     <div class="grid-4" style="margin-bottom:14px">
-      <div class="card span-2"><div class="card-title">LRP — Total Open P/L</div><div class="stat-val ${l.openPL<0?'neg':'pos'}">${f$(l.openPL,2)}</div></div>
-      <div class="card"><div class="card-title">Active Policies</div><div class="stat-val">${l.rows.length}</div></div>
+      <div class="card span-2"><div class="card-title">LRP — Total Premium Cost</div><div class="stat-val neg">${f$(totalCost,0)}</div></div>
+      <div class="card"><div class="card-title">Total Contracts</div><div class="stat-val">${fN(totalContracts,2)}</div></div>
+      <div class="card"><div class="card-title">Total Head Covered</div><div class="stat-val">${fN(totalHead,0)}</div></div>
     </div>
     <div class="card"><div class="card-title">Livestock Risk Protection Policies</div>
-      <div class="tbl-wrap"><table class="gen"><thead><tr><th>Date</th><th>Contract</th><th>Type</th><th class="tr">Strike</th><th class="tr">Head</th><th>Code</th><th class="tr">Contracts</th><th class="tr">Weight</th><th class="tr">Total Cost</th><th class="tr">$/CWT</th><th class="tr">Current $</th><th class="tr">Open P/L</th><th>Category</th></tr></thead><tbody>${tbody}</tbody></table></div>
+      <div class="tbl-wrap"><table class="gen">
+        <thead><tr><th>Exp. Date</th><th>Contract</th><th>Type</th><th class="tr">Strike</th><th class="tr">Head</th><th>Code</th><th class="tr">Contracts</th><th class="tr">Weight</th><th class="tr">Total Cost</th><th class="tr">$/CWT</th><th class="tr">Total Cost $</th><th>Category</th></tr></thead>
+        <tbody>${tbody}</tbody>
+      </table></div>
     </div>`;
 }
 
-// ── WHAT IF ───────────────────────────────────────────────
+// ── WHAT-IF HEDGES ─────────────────────────────────────────
+function renderWhatIfHedges(c){
+  const panel=document.getElementById('panel-whatifhedges');
+  if(!c){panel.innerHTML=emptyState('No Data','Upload an Excel file to use What-If Hedges.');return;}
+
+  const sheetPositions=c.wihPositions||[];
+
+  panel.innerHTML=`
+    <div class="grid-4">
+      <div class="card span-2">
+        <div class="card-title">What-If Hedges</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.7">
+          Model hypothetical hedge positions to evaluate potential P&L impact at different price levels.
+          Positions from the Excel sheet are loaded automatically. Add custom scenarios below.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Sheet Positions</div>
+        <div class="stat-val gold">${sheetPositions.length}</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Custom Positions</div>
+        <div class="stat-val" id="wih-extra-count">${wihExtraPositions.length}</div>
+      </div>
+    </div>
+
+    <!-- ADD POSITION FORM -->
+    <div class="wih-section">
+      <div class="wih-section-title">Add What-If Position</div>
+      <div class="wih-input-row">
+        <div class="wih-input-group">
+          <span class="wih-input-label">B / S</span>
+          <select class="wih-select" id="wih-bs">
+            <option value="Sell">Sell</option>
+            <option value="Buy">Buy</option>
+          </select>
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Instrument</span>
+          <select class="wih-select" id="wih-type">
+            <option value="Futures">Futures</option>
+            <option value="Put">Put</option>
+            <option value="Call">Call</option>
+          </select>
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Cattle Type</span>
+          <select class="wih-select" id="wih-cattle" onchange="document.getElementById('wih-size').value=this.value==='Live'?400:500">
+            <option value="Feeder">Feeder Cattle</option>
+            <option value="Live">Live Cattle</option>
+          </select>
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Contract</span>
+          <input class="wih-input" id="wih-contract" type="text" placeholder="e.g. GFX5" style="width:90px">
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Contracts</span>
+          <input class="wih-input" id="wih-contracts" type="number" value="1" min="1" style="width:80px">
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Size (lbs)</span>
+          <input class="wih-input" id="wih-size" type="number" value="500" min="1" style="width:80px">
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Enter Price</span>
+          <input class="wih-input" id="wih-enter" type="number" step="0.001" placeholder="0.000" style="width:90px">
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Strike (opts)</span>
+          <input class="wih-input" id="wih-strike" type="number" step="0.001" placeholder="0.000" style="width:90px">
+        </div>
+        <button class="wih-btn" onclick="wihAddPosition()">+ Add Position</button>
+      </div>
+      <div id="wih-add-error" style="color:var(--red);font-size:11px;display:none;margin-top:4px;"></div>
+    </div>
+
+    <!-- SHEET POSITIONS TABLE -->
+    ${sheetPositions.length?`
+    <div class="wih-section">
+      <div class="wih-section-title">Positions from Excel Sheet (${sheetPositions.length})</div>
+      <div class="tbl-wrap">
+        <table class="wih-positions-table">
+          <thead><tr>
+            <th>B/S</th><th>Description</th><th>Type</th><th>Contract</th><th class="tr">Contracts</th>
+            <th class="tr">Size</th><th class="tr">Enter Price</th><th class="tr">Strike</th>
+            <th>Category</th><th class="tr">P/L @ Scenario</th>
+          </tr></thead>
+          <tbody id="wih-sheet-tbody">
+            ${sheetPositions.map((p,i)=>{
+              const bsCls=p.bs==='Buy'?'b-buy':'b-sell';
+              const catCls=p.cattleType==='Live'?'b-live':'b-feed';
+              return`<tr>
+                <td><span class="badge ${bsCls}">${p.bs||''}</span></td>
+                <td style="font-family:'IBM Plex Sans',sans-serif">${p.desc||p.typeStr||''}</td>
+                <td>${p.typeStr||''}</td>
+                <td>${p.contract||''}</td>
+                <td class="tr">${fN(p.contracts,0)}</td>
+                <td class="tr">${fN(p.size,0)}</td>
+                <td class="tr">${fN(p.enterPrice,3)}</td>
+                <td class="tr">${p.strike?fN(p.strike,3):'—'}</td>
+                <td><span class="badge ${catCls}">${p.cattleType||''}</span></td>
+                <td class="tr" id="wih-sheet-pl-${i}">—</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`:''}
+
+    <!-- CUSTOM / EXTRA POSITIONS TABLE -->
+    <div class="wih-section">
+      <div class="wih-section-title" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Custom What-If Positions</span>
+        <button class="wih-btn-danger" onclick="wihClearAll()" style="font-size:10px;padding:4px 10px">Clear All Custom</button>
+      </div>
+      <div class="tbl-wrap" id="wih-extra-wrap">
+        ${renderWIHExtraTable()}
+      </div>
+    </div>
+  `;
+}
+
+function renderWIHExtraTable(){
+  if(!wihExtraPositions.length){
+    return`<div style="padding:20px;color:var(--text-muted);font-size:12px;text-align:center;">No custom positions added yet. Use the form above to add what-if scenarios.</div>`;
+  }
+  const rows=wihExtraPositions.map((p,i)=>{
+    const bsCls=p.bs==='Buy'?'b-buy':'b-sell';
+    const typeCls=p.type==='Put'?'b-put':p.type==='Call'?'b-call':'b-fut';
+    const catCls=p.cattleType==='Live'?'b-live':'b-feed';
+    return`<tr class="wi-row">
+      <td><span class="badge ${bsCls}">${p.bs}</span></td>
+      <td><span class="badge ${typeCls}">${p.type}</span></td>
+      <td>${p.contract||''}</td>
+      <td class="tr">${fN(p.contracts,0)}</td>
+      <td class="tr">${fN(p.size,0)}</td>
+      <td class="tr">${fN(p.enterPrice,3)}</td>
+      <td class="tr">${p.strike?fN(p.strike,3):'—'}</td>
+      <td><span class="badge ${catCls}">${p.cattleType}</span></td>
+      <td class="tr" id="wih-extra-pl-${i}">—</td>
+      <td><button class="wih-remove-btn" onclick="wihRemove(${i})">✕</button></td>
+    </tr>`;
+  }).join('');
+  return`<table class="wih-positions-table">
+    <thead><tr>
+      <th>B/S</th><th>Type</th><th>Contract</th><th class="tr">Contracts</th>
+      <th class="tr">Size</th><th class="tr">Enter Price</th><th class="tr">Strike</th>
+      <th>Category</th><th class="tr">P/L @ Scenario</th><th></th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function wihAddPosition(){
+  const errEl=document.getElementById('wih-add-error');
+  const bs=document.getElementById('wih-bs').value;
+  const type=document.getElementById('wih-type').value;
+  const cattleType=document.getElementById('wih-cattle').value;
+  const contract=document.getElementById('wih-contract').value.trim().toUpperCase();
+  const contracts=parseFloat(document.getElementById('wih-contracts').value)||0;
+  const size=parseFloat(document.getElementById('wih-size').value)||0;
+  const enterPrice=parseFloat(document.getElementById('wih-enter').value)||0;
+  const strike=parseFloat(document.getElementById('wih-strike').value)||0;
+
+  if(!contracts||!size||!enterPrice){
+    errEl.textContent='Please enter Contracts, Size, and Enter Price.';
+    errEl.style.display='block';
+    return;
+  }
+  if((type==='Put'||type==='Call')&&!strike){
+    errEl.textContent='Please enter a Strike price for Put/Call options.';
+    errEl.style.display='block';
+    return;
+  }
+  errEl.style.display='none';
+
+  wihExtraPositions.push({bs,type,cattleType,contract,contracts,size,enterPrice,strike});
+  try{ localStorage.setItem(WIH_EXTRA_KEY, JSON.stringify(wihExtraPositions)); } catch(e){}
+
+  // Refresh just the extra table and count
+  const wrap=document.getElementById('wih-extra-wrap');
+  if(wrap) wrap.innerHTML=renderWIHExtraTable();
+  const cnt=document.getElementById('wih-extra-count');
+  if(cnt) cnt.textContent=wihExtraPositions.length;
+  // Update Summary and What If Analysis with the new custom position
+  recalcAll();
+  if(currentClient) renderWhatIf(currentClient);
+  // Reset form
+  document.getElementById('wih-contracts').value='1';
+  document.getElementById('wih-size').value='500';
+  document.getElementById('wih-enter').value='';
+  document.getElementById('wih-strike').value='';
+  document.getElementById('wih-contract').value='';
+}
+
+function wihRemove(idx){
+  wihExtraPositions.splice(idx,1);
+  try{ localStorage.setItem(WIH_EXTRA_KEY, JSON.stringify(wihExtraPositions)); } catch(e){}
+  const wrap=document.getElementById('wih-extra-wrap');
+  if(wrap) wrap.innerHTML=renderWIHExtraTable();
+  const cnt=document.getElementById('wih-extra-count');
+  if(cnt) cnt.textContent=wihExtraPositions.length;
+  recalcAll();
+  if(currentClient) renderWhatIf(currentClient);
+}
+
+function wihClearAll(){
+  if(!confirm('Clear all custom what-if positions?'))return;
+  wihExtraPositions=[];
+  try{ localStorage.removeItem(WIH_EXTRA_KEY); } catch(e){}
+  const wrap=document.getElementById('wih-extra-wrap');
+  if(wrap) wrap.innerHTML=renderWIHExtraTable();
+  const cnt=document.getElementById('wih-extra-count');
+  if(cnt) cnt.textContent=0;
+  recalcAll();
+  if(currentClient) renderWhatIf(currentClient);
+}
+
+// ── WHAT IF ANALYSIS ────────────────────────────────────────
+// Augments the Excel-parsed VAR arrays with any custom WIH positions.
+// Returns {feederVAR, liveVAR, combinedVAR} each an array parallel to w.pcts.
+function computeAugmentedVAR(w){
+  const fcCustom=wihExtraPositions.filter(p=>p.cattleType==='Feeder');
+  const lcCustom=wihExtraPositions.filter(p=>p.cattleType==='Live');
+  const hasCustom=fcCustom.length||lcCustom.length;
+
+  return w.pcts.map((pct,i)=>{
+    const fcPrice=w.feederPrices[i];
+    const lcPrice=w.livePrices[i];
+    let fcAdj=0, lcAdj=0;
+    if(hasCustom){
+      fcCustom.forEach(p=>{ if(fcPrice!=null) fcAdj+=wihPosToPL(p,fcPrice); });
+      lcCustom.forEach(p=>{ if(lcPrice!=null) lcAdj+=wihPosToPL(p,lcPrice); });
+    }
+    const fv=(w.feederVAR[i]||0)+fcAdj;
+    const lv=(w.liveVAR[i]||0)+lcAdj;
+    const cv=(w.combinedVAR[i]||0)+fcAdj+lcAdj;
+    return{feederVAR:fv, liveVAR:lv, combinedVAR:cv};
+  });
+}
+
 function renderWhatIf(c){
   const w=c.whatif;
-  if(!w||!w.pcts||!w.pcts.length){document.getElementById('panel-whatif').innerHTML=emptyState('No What If Data','No scenario analysis found in this file.');return;}
+  if(!w||!w.pcts.length){document.getElementById('panel-whatif').innerHTML=emptyState('No What If Data','Upload an Excel file to view scenario analysis.');return;}
   const curIdx=w.pcts.findIndex(p=>Math.abs(p)<0.001);
+  const augmented=computeAugmentedVAR(w);
+  const customCount=wihExtraPositions.length;
+
   const tableRows=w.pcts.map((p,i)=>{
     const cur=Math.abs(p)<0.001;
-    return`<tr style="${cur?'background:rgba(201,168,76,0.07)':''}"><td class="${cur?'tg tr':'tr'}">${cur?'→ ':''}${(p*100).toFixed(1)}%</td><td class="tr">${f$(w.feederPrices[i],2)}</td><td class="tr">${f$(w.livePrices[i],2)}</td><td class="tr ${tc(w.feederVAR[i])}">${f$(w.feederVAR[i],0)}</td><td class="tr ${tc(w.liveVAR[i])}">${f$(w.liveVAR[i],0)}</td><td class="tr ${tc(w.combinedVAR[i])}">${f$(w.combinedVAR[i],0)}</td></tr>`;
+    const av=augmented[i];
+    return`<tr style="${cur?'background:rgba(201,168,76,0.07)':''}">
+      <td class="${cur?'tg tr':'tr'}">${cur?'→ ':''}${(p*100).toFixed(1)}%</td>
+      <td class="tr">${f$(w.feederPrices[i],2)}</td>
+      <td class="tr">${f$(w.livePrices[i],2)}</td>
+      <td class="tr ${tc(av.feederVAR)}">${f$(av.feederVAR,0)}</td>
+      <td class="tr ${tc(av.liveVAR)}">${f$(av.liveVAR,0)}</td>
+      <td class="tr ${tc(av.combinedVAR)}">${f$(av.combinedVAR,0)}</td>
+    </tr>`;
   }).join('');
+
+  const curAug=augmented[curIdx]||{feederVAR:0,liveVAR:0,combinedVAR:0};
+
   document.getElementById('panel-whatif').innerHTML=`
     <div class="grid-4">
-      <div class="card"><div class="card-title">Scenarios</div><div class="stat-val">${w.pcts.length}</div></div>
-      <div class="card"><div class="card-title">Feeder VAR (Current)</div><div class="stat-val ${w.feederVAR[curIdx]<0?'neg':'pos'}">${f$(w.feederVAR[curIdx],0)}</div></div>
-      <div class="card"><div class="card-title">Live VAR (Current)</div><div class="stat-val ${w.liveVAR[curIdx]<0?'neg':'pos'}">${f$(w.liveVAR[curIdx],0)}</div></div>
-      <div class="card"><div class="card-title">Combined VAR (Current)</div><div class="stat-val ${w.combinedVAR[curIdx]<0?'neg':'pos'}">${f$(w.combinedVAR[curIdx],0)}</div></div>
+      <div class="card"><div class="card-title">Scenarios</div><div class="stat-val">${w.pcts.length}</div>${customCount?`<div class="s-card-sub" style="color:var(--orange);margin-top:4px">+${customCount} custom position${customCount>1?'s':''} included</div>`:''}</div>
+      <div class="card"><div class="card-title">Feeder VAR (Current)</div><div class="stat-val ${curAug.feederVAR<0?'neg':'pos'}">${f$(curAug.feederVAR,0)}</div></div>
+      <div class="card"><div class="card-title">Live VAR (Current)</div><div class="stat-val ${curAug.liveVAR<0?'neg':'pos'}">${f$(curAug.liveVAR,0)}</div></div>
+      <div class="card"><div class="card-title">Combined VAR (Current)</div><div class="stat-val ${curAug.combinedVAR<0?'neg':'pos'}">${f$(curAug.combinedVAR,0)}</div></div>
     </div>
     <div class="card">
-      <div class="card-title">Value at Risk — Price Sensitivity</div>
+      <div class="card-title">Value at Risk — Price Sensitivity${customCount?` <span style="color:var(--orange);font-size:10px;font-weight:600">(+${customCount} CUSTOM)</span>`:''}</div>
       <div class="chart-controls">
         <button class="cht-tog active" id="tog-combined" onclick="setWM('combined')">Combined</button>
         <button class="cht-tog" id="tog-feeder" onclick="setWM('feeder')">Feeder Cattle</button>
@@ -991,15 +1363,18 @@ function renderWhatIf(c){
       </div>
       <div class="chart-container"><canvas id="wif-chart"></canvas></div>
     </div>
-    <div class="card"><div class="card-title">Scenario Table</div>
-      <div class="tbl-wrap"><table class="gen"><thead><tr><th>Change</th><th class="tr">Feeder Price</th><th class="tr">Live Price</th><th class="tr">Feeder VAR</th><th class="tr">Live VAR</th><th class="tr">Combined VAR</th></tr></thead><tbody>${tableRows}</tbody></table></div>
+    <div class="card"><div class="card-title">Scenario Table${customCount?` — includes ${customCount} custom What-If position${customCount>1?'s':''}`:''}</div>
+      <div class="tbl-wrap"><table class="gen">
+        <thead><tr><th>Change</th><th class="tr">Feeder Price</th><th class="tr">Live Price</th><th class="tr">Feeder VAR</th><th class="tr">Live VAR</th><th class="tr">Combined VAR</th></tr></thead>
+        <tbody>${tableRows}</tbody>
+      </table></div>
     </div>`;
   buildChart(c,'combined');
 }
 
 function setWM(m){
   ['combined','feeder','live','all'].forEach(x=>{const e=document.getElementById('tog-'+x);if(e)e.classList.toggle('active',x===m);});
-  if(currentData)buildChart(currentData,m);
+  if(currentClient)buildChart(currentClient,m);
 }
 function buildChart(c,mode){
   const w=c.whatif;
@@ -1007,15 +1382,22 @@ function buildChart(c,mode){
   const ctx=document.getElementById('wif-chart');
   if(!ctx)return;
   if(wifChart)wifChart.destroy();
+  // Use augmented VAR data (includes custom WIH positions)
+  const augmented=computeAugmentedVAR(w);
+  const augFC=augmented.map(a=>a.feederVAR);
+  const augLC=augmented.map(a=>a.liveVAR);
+  const augCB=augmented.map(a=>a.combinedVAR);
   const ds=[];
-  if(mode==='combined'||mode==='all')ds.push({label:'Combined VAR',data:w.combinedVAR,borderColor:'#c9a84c',backgroundColor:'rgba(201,168,76,0.08)',fill:mode==='combined',tension:0.4,pointRadius:0,borderWidth:2});
-  if(mode==='feeder'||mode==='all')  ds.push({label:'Feeder VAR',  data:w.feederVAR,  borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,0.06)', fill:mode==='feeder',  tension:0.4,pointRadius:0,borderWidth:2});
-  if(mode==='live'||mode==='all')    ds.push({label:'Live VAR',    data:w.liveVAR,    borderColor:'#2ecc71',backgroundColor:'rgba(46,204,113,0.06)', fill:mode==='live',    tension:0.4,pointRadius:0,borderWidth:2});
+  if(mode==='combined'||mode==='all')ds.push({label:'Combined VAR',data:augCB,borderColor:'#c9a84c',backgroundColor:'rgba(201,168,76,0.08)',fill:mode==='combined',tension:0.4,pointRadius:0,borderWidth:2});
+  if(mode==='feeder'||mode==='all')  ds.push({label:'Feeder VAR',  data:augFC,  borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,0.06)',fill:mode==='feeder',  tension:0.4,pointRadius:0,borderWidth:2});
+  if(mode==='live'||mode==='all')    ds.push({label:'Live VAR',    data:augLC,    borderColor:'#2ecc71',backgroundColor:'rgba(46,204,113,0.06)',fill:mode==='live',    tension:0.4,pointRadius:0,borderWidth:2});
   wifChart=new Chart(ctx,{type:'line',data:{labels,datasets:ds},options:{
     responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-    plugins:{legend:{labels:{color:'#7d8590',font:{family:'IBM Plex Mono',size:11}}},
+    plugins:{
+      legend:{labels:{color:'#7d8590',font:{family:'IBM Plex Mono',size:11}}},
       tooltip:{backgroundColor:'#161b22',borderColor:'#3a4149',borderWidth:1,titleColor:'#c9a84c',bodyColor:'#e6edf3',
-        callbacks:{label:ctx=>` ${ctx.dataset.label}: ${f$(ctx.raw,0)}`}}},
+        callbacks:{label:ctx=>` ${ctx.dataset.label}: ${f$(ctx.raw,0)}`}}
+    },
     scales:{
       x:{grid:{color:'#21262d'},ticks:{color:'#7d8590',font:{family:'IBM Plex Mono',size:10},maxTicksLimit:20}},
       y:{grid:{color:'#21262d'},ticks:{color:'#7d8590',font:{family:'IBM Plex Mono',size:10},callback:v=>f$(v/1000000,1)+'M'}}
@@ -1024,6 +1406,12 @@ function buildChart(c,mode){
 }
 
 function emptyState(title,sub){return`<div class="empty"><div class="empty-icon">📊</div><div class="empty-title">${title}</div><div style="font-size:12px;line-height:1.6;color:var(--text-muted)">${sub}</div></div>`;}
+function setInitialEmpty(msg){
+  const m=msg||'Log in to view your livestock risk data.';
+  ['summary','hedges','lrp','whatifhedges','whatif'].forEach(p=>{
+    document.getElementById('panel-'+p).innerHTML=emptyState('No Data',m);
+  });
+}
 </script>
 </body>
 </html>

@@ -251,6 +251,7 @@ table.gen tr:hover td{background:rgba(255,255,255,0.02);}
 const JSONBIN_API_KEY = '$2a$10$cgdrlN8gPFU.Dwm/fKTAq.1H7brY3nFAQv9GWRngMeY9aZO/diMe2';
 const JSONBIN_BASE    = 'https://api.jsonbin.io/v3';
 const REGISTRY_BIN_KEY = 'arc_registry_bin_id_v1';
+const HARDCODED_REGISTRY_BIN_ID = '69a4c42543b1c97be9aa4734';
 
 // ── BUILT-IN ADMIN USERS ──────────────────────────────────
 const ADMIN_USERS = {
@@ -337,21 +338,21 @@ async function jbUpdate(binId,data){
 // ── REGISTRY ─────────────────────────────────────────────
 async function loadRegistry(){
   if(registry)return registry;
-  registryBinId=localStorage.getItem(REGISTRY_BIN_KEY);
-  if(registryBinId){
-    try{ registry=await jbRead(registryBinId); return registry; }
-    catch(e){ console.warn('Registry read failed'); }
+  // Always use the hardcoded registry bin ID — same for every browser/device
+  registryBinId = HARDCODED_REGISTRY_BIN_ID;
+  localStorage.setItem(REGISTRY_BIN_KEY, registryBinId);
+  try{
+    registry = await jbRead(registryBinId);
+    return registry;
+  } catch(e){
+    console.warn('Registry read failed, starting fresh');
+    registry = {clients:{}};
+    return registry;
   }
-  registry={clients:{}};
-  registryBinId=await jbCreate(registry,'ARC-Registry');
-  localStorage.setItem(REGISTRY_BIN_KEY,registryBinId);
-  return registry;
 }
 async function saveRegistry(){
-  if(!registryBinId){
-    registryBinId=await jbCreate(registry,'ARC-Registry');
-    localStorage.setItem(REGISTRY_BIN_KEY,registryBinId);
-  } else { await jbUpdate(registryBinId,registry); }
+  registryBinId = HARDCODED_REGISTRY_BIN_ID;
+  await jbUpdate(registryBinId, registry);
 }
 
 // ── ADMIN VIEW ────────────────────────────────────────────

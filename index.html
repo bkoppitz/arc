@@ -210,14 +210,13 @@ table.gen tr:hover td{background:rgba(255,255,255,0.02);}
     <div class="tab active" onclick="showTab('summary')">Summary</div>
     <div class="tab" onclick="showTab('hedges')">Hedges</div>
     <div class="tab" onclick="showTab('lrp')">LRP</div>
-    <div class="tab" onclick="showTab('whatifhedges')">What-If Hedges</div>
     <div class="tab" onclick="showTab('whatif')">What If Analysis</div>
   </div>
   <div class="main">
     <div id="panel-summary" class="panel active"></div>
     <div id="panel-hedges" class="panel"></div>
     <div id="panel-lrp" class="panel"></div>
-    <div id="panel-whatifhedges" class="panel"></div>
+    <div id="panel-whatifhedges" class="panel" style="display:none"></div>
     <div id="panel-whatif" class="panel"></div>
   </div>
   <div class="disclaimer-footer">
@@ -312,7 +311,6 @@ function doLogout(){
     <div class="tab active" onclick="showTab('summary')">Summary</div>
     <div class="tab" onclick="showTab('hedges')">Hedges</div>
     <div class="tab" onclick="showTab('lrp')">LRP</div>
-    <div class="tab" onclick="showTab('whatifhedges')">What-If Hedges</div>
     <div class="tab" onclick="showTab('whatif')">What If Analysis</div>`;
 }
 
@@ -479,7 +477,6 @@ async function viewClientData(clientId){
       <div class="tab active" onclick="showTab('summary')">Summary</div>
       <div class="tab" onclick="showTab('hedges')">Hedges</div>
       <div class="tab" onclick="showTab('lrp')">LRP</div>
-      <div class="tab" onclick="showTab('whatifhedges')">What-If Hedges</div>
       <div class="tab" onclick="showTab('whatif')">What If Analysis</div>`;
     ['summary','hedges','lrp','whatifhedges','whatif'].forEach(p=>document.getElementById('panel-'+p).classList.remove('active'));
     document.getElementById('panel-summary').classList.add('active');
@@ -491,7 +488,7 @@ async function viewClientData(clientId){
 }
 function setupAdminTabs(){
   document.getElementById('main-tabs').innerHTML=`<div class="tab active" onclick="renderAdminPanel()">⚙ Admin</div>`;
-  ['summary','hedges','lrp','whatifhedges','whatif'].forEach(p=>{document.getElementById('panel-'+p).classList.remove('active');document.getElementById('panel-'+p).innerHTML='';});
+  ['summary','hedges','lrp','whatif'].forEach(p=>{document.getElementById('panel-'+p).classList.remove('active');document.getElementById('panel-'+p).innerHTML='';});
   document.getElementById('panel-summary').classList.add('active');
 }
 
@@ -532,11 +529,9 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function showTab(name){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  const tabs=['summary','hedges','lrp','whatifhedges','whatif'];
-  const idx=tabs.indexOf(name);
-  const allTabs=document.querySelectorAll('.tab');
-  // Find the tab by its onclick content since admin tab is prepended
-  allTabs.forEach(t=>{if(t.getAttribute('onclick')&&t.getAttribute('onclick').includes("'"+name+"'"))t.classList.add('active');});
+  document.querySelectorAll('.tab').forEach(t=>{
+    if(t.getAttribute('onclick')&&t.getAttribute('onclick').includes("'"+name+"'"))t.classList.add('active');
+  });
   document.getElementById('panel-'+name).classList.add('active');
 }
 
@@ -792,7 +787,7 @@ function fP(v){return(v==null||isNaN(v))?'—':(Number(v)*100).toFixed(1)+'%';}
 function nc(v){return(v!=null&&!isNaN(v)&&Number(v)<0)?'neg':'';}
 function tc(v){return(v!=null&&!isNaN(v))?Number(v)<0?'tn':Number(v)>0?'tp':'':'';}
 
-function renderAll(c){renderSummary(c);renderHedges(c);renderLRP(c);renderWhatIfHedges(c);renderWhatIf(c);}
+function renderAll(c){renderSummary(c);renderHedges(c);renderLRP(c);renderWhatIf(c);}
 
 // ── SUMMARY ────────────────────────────────────────────────
 function renderSummary(c){
@@ -902,6 +897,8 @@ function renderSummary(c){
   <div class="note-green">$$ — Current Futures Price is marked-to-market at recent prices</div>
   `;
   recalcAll();
+  // Render What-If Hedges inline below summary
+  renderWhatIfHedgesInline(c);
 }
 
 // ── RECALCULATE ────────────────────────────────────────────
@@ -1082,13 +1079,121 @@ function renderLRP(c){
     </div>`;
 }
 
-// ── WHAT-IF HEDGES ─────────────────────────────────────────
+// ── WHAT-IF HEDGES INLINE (embedded in Summary tab) ────────
+function renderWhatIfHedgesInline(c){
+  const panel=document.getElementById('panel-summary');
+  if(!c){return;}
+  const container=document.createElement('div');
+  container.id='wih-inline-container';
+  container.style.marginTop='28px';
+  // Build the same content as renderWhatIfHedges but append to summary panel
+  const sheetPositions=c.wihPositions||[];
+  container.innerHTML=`
+    <div class="sec-title">What-If Hedges</div>
+    <div class="grid-4">
+      <div class="card span-2">
+        <div class="card-title">What-If Hedges</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.7">
+          Model hypothetical hedge positions to evaluate potential P&L impact at different price levels.
+          Positions from the Excel sheet are loaded automatically. Add custom scenarios below.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Sheet Positions</div>
+        <div class="stat-val gold">${sheetPositions.length}</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Custom Positions</div>
+        <div class="stat-val" id="wih-extra-count">${wihExtraPositions.length}</div>
+      </div>
+    </div>
+    <!-- ADD POSITION FORM -->
+    <div class="wih-section">
+      <div class="wih-section-title">Add What-If Position</div>
+      <div class="wih-input-row">
+        <div class="wih-input-group">
+          <span class="wih-input-label">B / S</span>
+          <select class="wih-select" id="wih-bs"><option value="Sell">Sell</option><option value="Buy">Buy</option></select>
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Instrument</span>
+          <select class="wih-select" id="wih-type"><option value="Futures">Futures</option><option value="Put">Put</option><option value="Call">Call</option></select>
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Cattle Type</span>
+          <select class="wih-select" id="wih-cattle" onchange="document.getElementById('wih-size').value=this.value==='Live'?400:500">
+            <option value="Feeder">Feeder Cattle</option><option value="Live">Live Cattle</option>
+          </select>
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Contract</span>
+          <input class="wih-input" id="wih-contract" type="text" placeholder="e.g. GFX5" style="width:90px">
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Contracts</span>
+          <input class="wih-input" id="wih-contracts" type="number" value="1" min="1" style="width:80px">
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Size (lbs)</span>
+          <input class="wih-input" id="wih-size" type="number" value="500" min="1" style="width:80px">
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Enter Price</span>
+          <input class="wih-input" id="wih-enter" type="number" step="0.001" placeholder="0.000" style="width:90px">
+        </div>
+        <div class="wih-input-group">
+          <span class="wih-input-label">Strike (opts)</span>
+          <input class="wih-input" id="wih-strike" type="number" step="0.001" placeholder="0.000" style="width:90px">
+        </div>
+        <button class="wih-btn" onclick="wihAddPosition()">+ Add Position</button>
+      </div>
+      <div id="wih-add-error" style="color:var(--red);font-size:11px;display:none;margin-top:4px;"></div>
+    </div>
+    ${sheetPositions.length?`
+    <div class="wih-section">
+      <div class="wih-section-title">Positions from Excel Sheet (${sheetPositions.length})</div>
+      <div class="tbl-wrap">
+        <table class="wih-positions-table">
+          <thead><tr>
+            <th>B/S</th><th>Description</th><th>Type</th><th>Contract</th><th class="tr">Contracts</th>
+            <th class="tr">Size</th><th class="tr">Enter Price</th><th class="tr">Strike</th>
+            <th>Category</th><th class="tr">P/L @ Scenario</th>
+          </tr></thead>
+          <tbody>${sheetPositions.map((p,i)=>{
+            const bsCls=p.bs==='Buy'?'b-buy':'b-sell';
+            const catCls=p.cattleType==='Live'?'b-live':'b-feed';
+            return`<tr>
+              <td><span class="badge ${bsCls}">${p.bs||''}</span></td>
+              <td style="font-family:'IBM Plex Sans',sans-serif">${p.desc||p.typeStr||''}</td>
+              <td>${p.typeStr||''}</td><td>${p.contract||''}</td>
+              <td class="tr">${fN(p.contracts,0)}</td><td class="tr">${fN(p.size,0)}</td>
+              <td class="tr">${fN(p.enterPrice,3)}</td><td class="tr">${p.strike?fN(p.strike,3):'—'}</td>
+              <td><span class="badge ${catCls}">${p.cattleType||''}</span></td>
+              <td class="tr" id="wih-sheet-pl-${i}">—</td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>
+    </div>`:''}
+    <div class="wih-section">
+      <div class="wih-section-title" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Custom What-If Positions</span>
+        <button class="wih-btn-danger" onclick="wihClearAll()" style="font-size:10px;padding:4px 10px">Clear All Custom</button>
+      </div>
+      <div class="tbl-wrap" id="wih-extra-wrap">${renderWIHExtraTable()}</div>
+    </div>`;
+  panel.appendChild(container);
+}
+
+// ── WHAT-IF HEDGES (standalone panel — kept for internal use) ──
 function renderWhatIfHedges(c){
+  // No-op: content is now embedded in Summary tab via renderWhatIfHedgesInline
+}
+
+function _oldWhatIfHedgesBody_unused(c){
   const panel=document.getElementById('panel-whatifhedges');
   if(!c){panel.innerHTML=emptyState('No Data','Upload an Excel file to use What-If Hedges.');return;}
-
   const sheetPositions=c.wihPositions||[];
-
   panel.innerHTML=`
     <div class="grid-4">
       <div class="card span-2">
@@ -1203,7 +1308,7 @@ function renderWhatIfHedges(c){
       </div>
     </div>
   `;
-}
+} // end _oldWhatIfHedgesBody_unused
 
 function renderWIHExtraTable(){
   if(!wihExtraPositions.length){

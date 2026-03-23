@@ -242,6 +242,23 @@ table.gen tr:hover td{background:rgba(255,255,255,0.02);}
   </div>
 </div>
 
+<!-- ONEDRIVE LINK MODAL -->
+<div class="modal-overlay" id="onedrive-modal" onclick="if(event.target===this)closeOneDriveModal()">
+  <div class="modal">
+    <div class="modal-title">Link OneDrive File</div>
+    <div class="modal-sub">Paste the OneDrive sharing link for this client's Excel file. Their data will auto-refresh every time they log in — no manual uploads needed.<br><br>
+      <strong style="color:var(--text)">How to get the link:</strong> Open OneDrive → right-click the Excel file → Share → set to "Anyone with link can view" → Copy link.
+    </div>
+    <label class="modal-label">OneDrive Sharing Link</label>
+    <input class="modal-input" id="od-link-input" type="url" placeholder="https://1drv.ms/x/...">
+    <div class="modal-btns">
+      <button class="modal-btn-primary" onclick="saveOneDriveLink()">Save Link</button>
+      <button class="modal-btn-secondary" onclick="closeOneDriveModal()">Cancel</button>
+      <button class="modal-btn-danger" onclick="clearOneDriveLink()">Remove Link</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -380,10 +397,15 @@ async function renderAdminPanel(){
           <div class="client-name">${esc(c.name)}</div>
           <div class="client-username">@${esc(c.username)}</div>
         </div>
-        <div class="client-status-badge ${c.binId?'has-data':'no-data'}">${c.binId?'● Loaded':'○ No Data'}</div>
+        <div class="client-status-badge ${c.oneDriveUrl?'has-data':c.binId?'has-data':'no-data'}">
+          ${c.oneDriveUrl?'⟳ Auto-Sync':c.binId?'● Loaded':'○ No Data'}
+        </div>
       </div>
-      <div class="client-updated">${c.updatedAt?'Updated: '+c.updatedAt:'Never uploaded'}</div>
+      <div class="client-updated">${c.updatedAt?'Uploaded: '+c.updatedAt:'Never uploaded'}</div>
       <div class="client-actions">
+        <button class="btn-secondary btn-small" onclick="openOneDriveModal('${id}')" style="color:${c.oneDriveUrl?'var(--green)':'var(--text-muted)'}">
+          ${c.oneDriveUrl?'✓ OneDrive Linked':'⟳ Link OneDrive'}
+        </button>
         <label class="upload-label btn-small" for="upl-${id}">⬆ Upload Excel</label>
         <input type="file" id="upl-${id}" accept=".xlsx,.xls" style="display:none" onchange="uploadClientFile(event,'${id}')">
         ${c.binId?`<button class="btn-secondary btn-small" onclick="viewClientData('${id}')">View Data</button>`:''}
@@ -440,6 +462,43 @@ async function deleteClient(id){
   catch(e){ showToast('Failed: '+e.message,'error'); }
 }
 
+// ── ONEDRIVE LINK MODAL ───────────────────────────────────
+let oneDriveTargetClientId = null;
+function openOneDriveModal(clientId){
+  oneDriveTargetClientId = clientId;
+  const client = registry.clients[clientId];
+  document.getElementById('od-link-input').value = client.oneDriveUrl||'';
+  document.getElementById('onedrive-modal').classList.add('open');
+}
+function closeOneDriveModal(){
+  document.getElementById('onedrive-modal').classList.remove('open');
+  oneDriveTargetClientId=null;
+}
+async function saveOneDriveLink(){
+  const url = document.getElementById('od-link-input').value.trim();
+  if(!url){ showToast('Please paste a OneDrive link.','error'); return; }
+  registry.clients[oneDriveTargetClientId].oneDriveUrl = url;
+  updateStatus('Saving…',true);
+  try{
+    await saveRegistry();
+    updateStatus('Saved',false);
+    showToast('OneDrive link saved! Data will auto-refresh on login.','success');
+    closeOneDriveModal();
+    renderAdminPanel();
+  } catch(e){ showToast('Failed: '+e.message,'error'); }
+}
+async function clearOneDriveLink(){
+  registry.clients[oneDriveTargetClientId].oneDriveUrl = null;
+  updateStatus('Saving…',true);
+  try{
+    await saveRegistry();
+    updateStatus('Saved',false);
+    showToast('OneDrive link removed.','success');
+    closeOneDriveModal();
+    renderAdminPanel();
+  } catch(e){ showToast('Failed: '+e.message,'error'); }
+}
+
 // ── UPLOAD CLIENT EXCEL ───────────────────────────────────
 async function uploadClientFile(event, clientId){
   const file=event.target.files[0]; if(!file)return;
@@ -493,21 +552,60 @@ function setupAdminTabs(){
   document.getElementById('panel-summary').classList.add('active');
 }
 
+// ── ONEDRIVE AUTO-FETCH ───────────────────────────────────
+// Converts any OneDrive share link to a direct download URL
+// using the official Microsoft Shares API (no CORS issues)
+function oneDriveToDirectUrl(shareUrl){
+  try{
+    const trimmed = shareUrl.trim();
+    const b64 = btoa(trimmed).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+    return `https://api.onedrive.com/v1.0/shares/u!${b64}/root/content`;
+  } catch(e){ return null; }
+}
+
+async function fetchFromOneDrive(shareUrl){
+  const directUrl = oneDriveToDirectUrl(shareUrl);
+  if(!directUrl) return null;
+  const resp = await fetch(directUrl);
+  if(!resp.ok) throw new Error('OneDrive fetch failed: HTTP '+resp.status);
+  const buf = await resp.arrayBuffer();
+  const wb = XLSX.read(new Uint8Array(buf),{type:'array',cellDates:true});
+  return parseWorkbook(wb);
+}
+
 // ── CLIENT VIEW ───────────────────────────────────────────
 async function showClientView(clientId){
   await loadRegistry();
   const client=registry.clients[clientId];
-  if(!client||!client.binId){
-    setInitialEmpty('Your data has not been uploaded yet. Please contact your advisor.');
-    updateStatus('No data available',false); return;
+  if(!client){ setInitialEmpty('Account not found. Please contact your advisor.'); updateStatus('No data available',false); return; }
+
+  // Try OneDrive auto-fetch first if a link is stored
+  if(client.oneDriveUrl){
+    updateStatus('Fetching latest data…',true);
+    try{
+      const data = await fetchFromOneDrive(client.oneDriveUrl);
+      if(data){
+        data.clientName=client.name;
+        currentClient=data;
+        try{const ex=localStorage.getItem(WIH_EXTRA_KEY);if(ex)wihExtraPositions=JSON.parse(ex);}catch(e){}
+        renderAll(data);
+        updateStatus('Live · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),false);
+        return;
+      }
+    } catch(err){
+      console.warn('OneDrive fetch failed, falling back to cached data:',err);
+    }
   }
+
+  // Fall back to JSONBin cached data
+  if(!client.binId){ setInitialEmpty('Your data has not been uploaded yet. Please contact your advisor.'); updateStatus('No data available',false); return; }
   updateStatus('Loading your data…',true);
   try{
     const data=await jbRead(client.binId);
     currentClient=data;
     try{const ex=localStorage.getItem(WIH_EXTRA_KEY);if(ex)wihExtraPositions=JSON.parse(ex);}catch(e){}
     renderAll(data);
-    updateStatus('Updated: '+(data.uploadDate||'—'),false);
+    updateStatus('Cached · '+( data.uploadDate||'—'),false);
   } catch(err){ setInitialEmpty('Failed to load data. Please try again or contact your advisor.'); updateStatus('Error',false); }
 }
 

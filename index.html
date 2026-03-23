@@ -554,12 +554,12 @@ function setupAdminTabs(){
 
 // ── ONEDRIVE AUTO-FETCH ───────────────────────────────────
 // Converts any OneDrive share link to a direct download URL
-// using the official Microsoft Shares API (no CORS issues)
+// using the Microsoft Graph Shares API
 function oneDriveToDirectUrl(shareUrl){
   try{
     const trimmed = shareUrl.trim();
     const b64 = btoa(trimmed).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
-    return `https://api.onedrive.com/v1.0/shares/u!${b64}/root/content`;
+    return `https://graph.microsoft.com/v1.0/shares/u!${b64}/root/content`;
   } catch(e){ return null; }
 }
 

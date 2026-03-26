@@ -235,6 +235,8 @@ table.gen tr:hover td{background:rgba(255,255,255,0.02);}
     <input class="modal-input" id="new-client-user" placeholder="e.g. johnsonranch">
     <label class="modal-label">Password</label>
     <input class="modal-input" id="new-client-pass" placeholder="e.g. johnson2025">
+    <label class="modal-label">Excel Filename (in your OneDrive folder)</label>
+    <input class="modal-input" id="new-client-file" placeholder="e.g. Client Summary Johnson Ranch.xlsx">
     <div class="modal-btns">
       <button class="modal-btn-primary" onclick="saveNewClient()">Add Client</button>
       <button class="modal-btn-secondary" onclick="closeAddClient()">Cancel</button>
@@ -401,14 +403,15 @@ async function renderAdminPanel(){
           ${c.oneDriveUrl?'⟳ Auto-Sync':c.binId?'● Loaded':'○ No Data'}
         </div>
       </div>
-      <div class="client-updated">${c.updatedAt?'Uploaded: '+c.updatedAt:'Never uploaded'}</div>
+      <div class="client-updated" style="margin-bottom:4px">${c.updatedAt?'Updated: '+c.updatedAt:'Never uploaded'}</div>
+      <div class="client-updated" style="margin-bottom:12px;color:${c.excelFile?'var(--text-dim)':'var(--red)'}">
+        📄 ${c.excelFile?esc(c.excelFile):'No Excel file set'}
+      </div>
       <div class="client-actions">
-        <button class="btn-secondary btn-small" onclick="openOneDriveModal('${id}')" style="color:${c.oneDriveUrl?'var(--green)':'var(--text-muted)'}">
-          ${c.oneDriveUrl?'✓ OneDrive Linked':'⟳ Link OneDrive'}
-        </button>
         <label class="upload-label btn-small" for="upl-${id}">⬆ Upload Excel</label>
         <input type="file" id="upl-${id}" accept=".xlsx,.xls" style="display:none" onchange="uploadClientFile(event,'${id}')">
         ${c.binId?`<button class="btn-secondary btn-small" onclick="viewClientData('${id}')">View Data</button>`:''}
+        <button class="btn-secondary btn-small" onclick="editClientFile('${id}')" style="color:var(--text-muted)">✏ Edit Filename</button>
         <button class="btn-danger btn-small" onclick="deleteClient('${id}')">Remove</button>
       </div>
     </div>`).join('');
@@ -431,19 +434,20 @@ async function renderAdminPanel(){
 function openAddClient(){ document.getElementById('add-client-modal').classList.add('open'); }
 function closeAddClient(){
   document.getElementById('add-client-modal').classList.remove('open');
-  ['new-client-name','new-client-user','new-client-pass'].forEach(id=>document.getElementById(id).value='');
+  ['new-client-name','new-client-user','new-client-pass','new-client-file'].forEach(id=>document.getElementById(id).value='');
 }
 async function saveNewClient(){
   const name=document.getElementById('new-client-name').value.trim();
   const user=document.getElementById('new-client-user').value.trim().toLowerCase();
   const pass=document.getElementById('new-client-pass').value.trim();
-  if(!name||!user||!pass){showToast('Please fill in all fields.','error');return;}
+  const file=document.getElementById('new-client-file').value.trim();
+  if(!name||!user||!pass){showToast('Please fill in name, username and password.','error');return;}
   if(ADMIN_USERS[user]){showToast('Username already exists.','error');return;}
   const dup=Object.values(registry.clients||{}).find(c=>c.username===user);
   if(dup){showToast('Username already exists.','error');return;}
   const id='client_'+Date.now();
   if(!registry.clients)registry.clients={};
-  registry.clients[id]={name,username:user,password:pass,binId:null,updatedAt:null};
+  registry.clients[id]={name,username:user,password:pass,excelFile:file||null,binId:null,updatedAt:null};
   updateStatus('Saving…',true);
   try{
     await saveRegistry();
@@ -460,6 +464,20 @@ async function deleteClient(id){
   updateStatus('Saving…',true);
   try{ await saveRegistry(); updateStatus('Saved',false); showToast('Client removed.','success'); renderAdminPanel(); }
   catch(e){ showToast('Failed: '+e.message,'error'); }
+}
+
+async function editClientFile(id){
+  const c=registry.clients[id];
+  const newFile=prompt(`Excel filename for ${c.name}:`, c.excelFile||'');
+  if(newFile===null)return; // cancelled
+  registry.clients[id].excelFile=newFile.trim()||null;
+  updateStatus('Saving…',true);
+  try{
+    await saveRegistry();
+    updateStatus('Saved',false);
+    showToast('Filename updated!','success');
+    renderAdminPanel();
+  } catch(e){ showToast('Failed: '+e.message,'error'); }
 }
 
 // ── ONEDRIVE LINK MODAL ───────────────────────────────────

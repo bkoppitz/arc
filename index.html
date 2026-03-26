@@ -551,7 +551,7 @@ async function viewClientData(clientId){
     const data=await jbRead(client.binId);
     currentClient=data;
     document.getElementById('main-tabs').innerHTML=`
-      <div class="tab" onclick="renderAdminPanel();setupAdminTabs()">⚙ Admin</div>
+      <div class="tab" onclick="setupAdminTabs()">⚙ Admin</div>
       <div class="tab active" onclick="showTab('summary')">Summary</div>
       <div class="tab" onclick="showTab('hedges')">Hedges</div>
       <div class="tab" onclick="showTab('lrp')">LRP</div>
@@ -565,9 +565,15 @@ async function viewClientData(clientId){
   } catch(err){ updateStatus('Error',false); showToast('Failed to load: '+err.message,'error'); }
 }
 function setupAdminTabs(){
+  currentClient=null;
   document.getElementById('main-tabs').innerHTML=`<div class="tab active" onclick="renderAdminPanel()">⚙ Admin</div>`;
-  ['summary','hedges','lrp','whatif'].forEach(p=>{document.getElementById('panel-'+p).classList.remove('active');document.getElementById('panel-'+p).innerHTML='';});
+  ['summary','hedges','lrp','whatifhedges','whatif'].forEach(p=>{
+    const el=document.getElementById('panel-'+p);
+    el.classList.remove('active');
+    el.innerHTML='';
+  });
   document.getElementById('panel-summary').classList.add('active');
+  renderAdminPanel();
 }
 
 // ── ONEDRIVE AUTO-FETCH ───────────────────────────────────

@@ -312,6 +312,7 @@ async function loginSuccess(username, role, clientId){
   document.getElementById('app').style.display='block';
   document.getElementById('lerr').style.display='none';
   document.getElementById('header-user').textContent=username.toUpperCase();
+  localStorage.setItem('arc_session', JSON.stringify({username, role, clientId}));
   if(role==='admin'){ showAdminView(); }
   else { showClientView(clientId); }
 }
@@ -320,8 +321,21 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&document.getElementById('login-screen').style.display!=='none')doLogin();
 });
 
+// ── AUTO-LOGIN FROM SAVED SESSION ─────────────────────────
+window.addEventListener('load', async ()=>{
+  try{
+    const saved=localStorage.getItem('arc_session');
+    if(saved){
+      const s=JSON.parse(saved);
+      await loadRegistry();
+      await loginSuccess(s.username, s.role, s.clientId);
+    }
+  } catch(e){ localStorage.removeItem('arc_session'); }
+});
+
 function doLogout(){
   currentRole=null; currentClientId=null; currentClient=null;
+  localStorage.removeItem('arc_session');
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('app').style.display='none';
   document.getElementById('lu').value='';

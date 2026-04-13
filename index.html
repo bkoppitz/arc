@@ -282,6 +282,7 @@ const ADMIN_USERS = {
 // ── STATE ─────────────────────────────────────────────────
 let currentClient=null, wifChart=null;
 let wihExtraPositions=[];
+let headScaleLC=1, headScaleFC=1; // scale factors when user overrides head count on Summary
 let currentRole=null, currentClientId=null;
 let registry=null, registryBinId=null;
 const WIH_EXTRA_KEY='arc_wih_extra_v1';
@@ -924,7 +925,7 @@ function fP(v){return(v==null||isNaN(v))?'—':(Number(v)*100).toFixed(1)+'%';}
 function nc(v){return(v!=null&&!isNaN(v)&&Number(v)<0)?'neg':'';}
 function tc(v){return(v!=null&&!isNaN(v))?Number(v)<0?'tn':Number(v)>0?'tp':'':'';}
 
-function renderAll(c){renderSummary(c);renderHedges(c);renderLRP(c);renderWhatIf(c);}
+function renderAll(c){headScaleLC=1;headScaleFC=1;renderSummary(c);renderHedges(c);renderLRP(c);renderWhatIf(c);}
 
 // ── SUMMARY ────────────────────────────────────────────────
 function renderSummary(c){
@@ -1106,6 +1107,14 @@ function recalcAll(){
   setEl('fc_np_wi','$ '+fN(fcNPWI,3));
   setEl('fc_hedge_diff',f$(fcHD,0),nc(fcHD));
   setEl('fc_var',f$(fcVAR,0),'yel');
+  // Update head scale factors so What-If Analysis tab reflects changed head counts
+  const origLC=currentClient.summary.lc_cur?.head||0;
+  const origFC=currentClient.summary.fc_cur?.head||0;
+  headScaleLC=(origLC>0&&lcHC>0)?lcHC/origLC:1;
+  headScaleFC=(origFC>0&&fcHC>0)?fcHC/origFC:1;
+  // Re-render What-If tab if it's currently visible, otherwise it'll pick up scales when opened
+  const wiPanel=document.getElementById('panel-whatif');
+  if(wiPanel&&wiPanel.classList.contains('active')) renderWhatIf(currentClient);
 }
 function setEl(id,txt,cls){const el=document.getElementById(id);if(!el)return;el.textContent=txt;if(cls!==undefined)el.className=cls;}
 
@@ -1559,9 +1568,10 @@ function computeAugmentedVAR(w){
       fcCustom.forEach(p=>{ if(fcPrice!=null) fcAdj+=wihPosToPL(p,fcPrice); });
       lcCustom.forEach(p=>{ if(lcPrice!=null) lcAdj+=wihPosToPL(p,lcPrice); });
     }
-    const fv=(w.feederVAR[i]||0)+fcAdj;
-    const lv=(w.liveVAR[i]||0)+lcAdj;
-    const cv=(w.combinedVAR[i]||0)+fcAdj+lcAdj;
+    // Scale base VAR by head count changes made on Summary page
+    const fv=(w.feederVAR[i]||0)*headScaleFC+fcAdj;
+    const lv=(w.liveVAR[i]||0)*headScaleLC+lcAdj;
+    const cv=(w.combinedVAR[i]||0)*((headScaleFC+headScaleLC)/2)+fcAdj+lcAdj;
     return{feederVAR:fv, liveVAR:lv, combinedVAR:cv};
   });
 }

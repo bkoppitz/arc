@@ -149,6 +149,12 @@ table.gen tr:hover td{background:rgba(255,255,255,0.02);}
 /* ADMIN PANEL */
 .admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
 .admin-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--gold);}
+.hc-activity-section{margin-top:28px;}
+.hc-activity-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--text-muted);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.hc-activity-title .hc-badge{background:var(--orange);color:#000;font-family:'IBM Plex Sans',sans-serif;font-size:10px;font-weight:700;padding:2px 7px;letter-spacing:1px;}
+.hc-empty{font-size:12px;color:var(--text-muted);padding:14px;border:1px dashed var(--border);text-align:center;}
+.hc-diff-pos{color:var(--green);}
+.hc-diff-neg{color:var(--red);}
 .btn-primary{background:var(--gold);border:none;color:#000;padding:9px 18px;font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;}
 .btn-primary:hover{opacity:.85;}
 .btn-secondary{background:var(--surface2);border:1px solid var(--border2);color:var(--text-muted);padding:9px 18px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;cursor:pointer;}
@@ -284,6 +290,10 @@ let currentClient=null, wifChart=null;
 let wihExtraPositions=[];
 let headScaleLC=1, headScaleFC=1; // scale factors when user overrides head count on Summary
 let currentRole=null, currentClientId=null;
+// Session-only head count activity log: { clientId: {clientName, lcHead, fcHead, origLC, origFC, timestamp} }
+const headCountLog={};
+let headCountDebounceTimer=null;
+const HEAD_COUNT_DEBOUNCE_MS=15*60*1000; // 15 minutes
 let registry=null, registryBinId=null;
 const WIH_EXTRA_KEY='arc_wih_extra_v1';
 
@@ -400,6 +410,48 @@ async function showAdminView(){
   await renderAdminPanel();
 }
 
+function renderHeadCountActivity(){
+  const entries=Object.values(headCountLog);
+  const hasBadge=entries.length>0;
+  let rows='';
+  if(entries.length===0){
+    rows=`<div class="hc-empty">No head count changes recorded this session.</div>`;
+  } else {
+    const tbody=entries.map(e=>{
+      const lcDiff=e.lcHead-e.origLC;
+      const fcDiff=e.fcHead-e.origFC;
+      const lcDiffStr=lcDiff===0?'—':`<span class="${lcDiff>0?'hc-diff-pos':'hc-diff-neg'}">${lcDiff>0?'+':''}${lcDiff.toLocaleString()}</span>`;
+      const fcDiffStr=fcDiff===0?'—':`<span class="${fcDiff>0?'hc-diff-pos':'hc-diff-neg'}">${fcDiff>0?'+':''}${fcDiff.toLocaleString()}</span>`;
+      return`<tr>
+        <td style="font-weight:600;color:var(--text)">${esc(e.clientName)}</td>
+        <td class="tr">${e.origLC!=null?fN(e.origLC,0):'—'}</td>
+        <td class="tr">${fN(e.lcHead,0)}</td>
+        <td class="tr">${lcDiffStr}</td>
+        <td class="tr">${e.origFC!=null?fN(e.origFC,0):'—'}</td>
+        <td class="tr">${fN(e.fcHead,0)}</td>
+        <td class="tr">${fcDiffStr}</td>
+        <td style="color:var(--text-muted);font-size:11px">${e.timestamp}</td>
+      </tr>`;
+    }).join('');
+    rows=`<div class="tbl-wrap"><table class="gen">
+      <thead><tr>
+        <th>Client</th>
+        <th class="tr">LC Original</th><th class="tr">LC Reported</th><th class="tr">LC Diff</th>
+        <th class="tr">FC Original</th><th class="tr">FC Reported</th><th class="tr">FC Diff</th>
+        <th>Captured</th>
+      </tr></thead>
+      <tbody>${tbody}</tbody>
+    </table></div>`;
+  }
+  return`<div class="hc-activity-section">
+    <div class="hc-activity-title">
+      Head Count Activity — This Session
+      ${hasBadge?`<span class="hc-badge">${entries.length} CLIENT${entries.length>1?'S':''}</span>`:''}
+    </div>
+    <div class="card">${rows}</div>
+  </div>`;
+}
+
 async function renderAdminPanel(){
   updateStatus('Loading clients…',true);
   await loadRegistry();
@@ -442,7 +494,8 @@ async function renderAdminPanel(){
     </div>
     ${count===0
       ?`<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">No Clients Yet</div><div style="font-size:12px;color:var(--text-muted)">Click "+ Add Client" to create your first client account.</div></div>`
-      :`<div class="clients-grid">${cards}</div>`}`;
+      :`<div class="clients-grid">${cards}</div>`}
+    ${renderHeadCountActivity()}`;
 }
 
 // ── ADD / DELETE CLIENT ───────────────────────────────────
@@ -1112,6 +1165,18 @@ function recalcAll(){
   const origFC=currentClient.summary.fc_cur?.head||0;
   headScaleLC=(origLC>0&&lcHC>0)?lcHC/origLC:1;
   headScaleFC=(origFC>0&&fcHC>0)?fcHC/origFC:1;
+  // Debounced snapshot: record head count after 15 min of inactivity
+  if(currentClientId && (lcHC!==origLC || fcHC!==origFC)){
+    clearTimeout(headCountDebounceTimer);
+    headCountDebounceTimer=setTimeout(()=>{
+      headCountLog[currentClientId]={
+        clientName: registry?.clients?.[currentClientId]?.name || currentClientId,
+        lcHead: lcHC, fcHead: fcHC,
+        origLC, origFC,
+        timestamp: new Date().toLocaleString()
+      };
+    }, HEAD_COUNT_DEBOUNCE_MS);
+  }
   // Re-render What-If tab if it's currently visible, otherwise it'll pick up scales when opened
   const wiPanel=document.getElementById('panel-whatif');
   if(wiPanel&&wiPanel.classList.contains('active')) renderWhatIf(currentClient);
